@@ -1,0 +1,13 @@
+{
+  "name": "ecommparse",
+  "description": "Parser for e-commerce web sites",
+  "version": "0.0.1",
+  "os": "linux",
+  "dependencies": {
+    "fast-html-parser": "^1.0.1",
+    "lodash": "2.4.1",
+    "microdata-node": "^0.2.1",
+    "request": "^2.62.0"
+  },
+  "devDependencies": {}
+}
