@@ -1,0 +1,14 @@
+{
+    "www.citrus.ua" : {
+        "title" : {
+            "property" : "og:title"
+        },
+        "price" : {
+            "microdata" : "items.0.properties.offers.0.properties.price.0"
+        },
+        "priceCurrency" : {
+            "microdata" : "items.0.properties.offers.0.properties.priceCurrency.0"
+        },
+        "image" : ""
+    }
+}
