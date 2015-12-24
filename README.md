@@ -1,6 +1,6 @@
 # Ecomparser
 
-Ecomparser is a library for parsing e-commerce web pages in order to retrieve the following data:
+Ecomparser is a Node.js library for parsing e-commerce web pages in order to retrieve the following data:
 
 *   Product title
 *   Canonical URL
