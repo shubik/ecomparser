@@ -7,9 +7,7 @@ var _               = require('lodash'),
     ns              = require('./lib/ns'),
     opengraph       = require('./lib/og'),
     getbytag        = require('./lib/getbytag'),
-    parseAttrs      = require('./lib/parseAttrs'),
-    noop            = function() {};
-
+    parseAttrs      = require('./lib/parseAttrs');
 
 
 function parseDecimal(str) {
@@ -17,7 +15,7 @@ function parseDecimal(str) {
 }
 
 
-function getHostInfo(hostname, siteData) {
+function getHostInfo(siteData, hostname) {
     var retval = _.reduce(siteData, function(memo, data, host) {
         var reStr = host.replace('*', '.+?'),
             re = new RegExp(reStr),
@@ -32,17 +30,24 @@ function getHostInfo(hostname, siteData) {
 
 
 module.exports = function(url, siteData) {
-    var def = deferred();
+    var def = deferred(),
+        reqOpts = {
+            url : url,
+            headers : {
+                'User-Agent'      : 'curl/7.35.0', // Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36
+                'Accept'          : '*',
+                'Accept-Encoding' : '',
+                'Cache-Control'   : 'max-age=0'
+            }
+        };
 
-    request(url, function (error, response, html) {
-        var retData  = {},
-            hostname = URLParser.parse(url).hostname;
+    request(reqOpts, function (error, response, html) {
+        var retData  = {};
 
-
-        retData.hostname = hostname;
+        retData.hostname = URLParser.parse(url).hostname;
 
         if (!error && response.statusCode == 200) {
-            var hostInfo = getHostInfo(hostname, siteData),
+            var hostInfo = getHostInfo(siteData, retData.hostname),
                 body,
                 microdata,
                 metatags;
@@ -62,7 +67,6 @@ module.exports = function(url, siteData) {
             metatags = body.querySelectorAll('meta');
 
 
-            // console.log('microdata:', JSON.stringify(microdata, null, 2));
             // console.log('PRICE:', ns.get(microdata, 'items.0.properties.offers.0.properties.price.0'));
 
 
@@ -115,6 +119,7 @@ module.exports = function(url, siteData) {
             def.resolve(retData);
 
         } else {
+            console.log('Error?', error, response);
             def.reject(error);
         }
     });

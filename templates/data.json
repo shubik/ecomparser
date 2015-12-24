@@ -56,6 +56,24 @@
         }
     },
 
+    "www.foxtrot.com.ua" : {
+        "title" : {
+            "opengraph" : "title"
+        },
+        "url" : {
+            "opengraph" : "url"
+        },
+        "image" : {
+            "opengraph" : "image"
+        },
+        "price" : {
+            "selector" : ".curr_price"
+        },
+        "priceCurrency" : {
+            "default"  : "UAH"
+        }
+    },
+
     "www.amazon.com" : {
         "title" : {
             "selector" : "#productTitle"
