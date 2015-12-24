@@ -31,13 +31,13 @@ var ecomparser = require('../index'),
 // });
 
 
-// var rozetka = ecomparser('http://bt.rozetka.com.ua/granchio-ecopan-88064-22/p151818/', siteData);
+var rozetka = ecomparser('http://bt.rozetka.com.ua/granchio-ecopan-88064-22/p151818/', siteData);
 
-// rozetka.done(function(val) {
-//     console.log('Done!', val);
-// }, function(err) {
-//     console.log('Failed!', err);
-// });
+rozetka.done(function(val) {
+    console.log('Done!', val);
+}, function(err) {
+    console.log('Failed!', err);
+});
 
 
 // var foxtrot = ecomparser('http://www.foxtrot.com.ua/ru/shop/holodilniki_delfa_dbf-150.html', siteData);
@@ -103,10 +103,10 @@ var ecomparser = require('../index'),
 // });
 
 
-var promua = ecomparser('http://prom.ua/p160879155-zimnyaya-kurtka-puhovik.html', siteData);
+// var promua = ecomparser('http://prom.ua/p160879155-zimnyaya-kurtka-puhovik.html', siteData);
 
-promua.done(function(val) {
-    console.log('Done!', val);
-}, function(err) {
-    console.log('Failed!');
-});
+// promua.done(function(val) {
+//     console.log('Done!', val);
+// }, function(err) {
+//     console.log('Failed!');
+// });
