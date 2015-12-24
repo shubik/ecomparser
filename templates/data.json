@@ -1,14 +1,60 @@
 {
     "www.citrus.ua" : {
         "title" : {
-            "property" : "og:title"
+            "opengraph" : "title"
+        },
+        "url" : {
+            "opengraph" : "url"
+        },
+        "image" : {
+            "opengraph" : "image"
         },
         "price" : {
             "microdata" : "items.0.properties.offers.0.properties.price.0"
         },
         "priceCurrency" : {
-            "microdata" : "items.0.properties.offers.0.properties.priceCurrency.0"
+            "microdata" : "items.0.properties.offers.0.properties.priceCurrency.0",
+            "default"  : "UAH"
+        }
+    },
+
+    "allo.ua" : {
+        "title" : {
+            "opengraph" : "title"
         },
-        "image" : ""
+        "url" : {
+            "opengraph" : "url"
+        },
+        "image" : {
+            "opengraph" : "image"
+        },
+        "price" : {
+            "microdata" : "items.3.properties.offers.0.properties.price.0"
+        },
+        "priceCurrency" : {
+            "microdata" : "items.3.properties.offers.0.properties.priceCurrency.0",
+            "default"  : "UAH"
+        }
+    },
+
+    "www.amazon.com" : {
+        "title" : {
+            "selector" : "#productTitle"
+        },
+        "url" : {
+            "link" : "rel=\"canonical\"",
+            "attr" : "href"
+        },
+        "image" : {
+            "selector" : "#landingImage",
+            "attr" : "data-old-hires"
+        },
+        "price" : {
+            "selector" : "#priceblock_ourprice"
+        },
+        "priceCurrency" : {
+            "selector" : "#productTitle",
+            "default"  : "USD"
+        }
     }
 }

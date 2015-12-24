@@ -1,93 +1,102 @@
 var _               = require('lodash'),
-    deferred        = require('deferred'),
-    HTMLParser      = require('fast-html-parser'),
     request         = require('request'),
-    microdataParser = require('microdata-node'),
     URLParser       = require('url'),
+    HTMLParser      = require('fast-html-parser'),
+    microdataParser = require('microdata-node'),
+    deferred        = require('deferred'),
     ns              = require('./lib/ns'),
-    siteData        = require('./templates/data.json'),
+    opengraph       = require('./lib/og'),
+    getbytag        = require('./lib/getbytag'),
+    parseAttrs      = require('./lib/parseAttrs'),
     noop            = function() {};
 
 
-module.exports = function(url) {
+module.exports = function(url, siteData) {
     var def = deferred();
 
     request(url, function (error, response, html) {
         var retData  = {},
             hostname = URLParser.parse(url).hostname;
 
+
         retData.hostname = hostname;
 
         if (!error && response.statusCode == 200) {
 
-            retData.error = null;
-
             var hostInfo = siteData[hostname],
                 body,
                 microdata,
-                price,
-                priceCurrency,
-                meta,
-                title,
-                canonicalUrl;
+                metatags;
 
+            /* --- Set default values --- */
 
-            /* --- Parse page --- */
+            retData.url           = url;
+            retData.title         = null;
+            retData.image         = null;
+            retData.price         = null;
+            retData.priceCurrency = null;
+
+            /* --- Parse page and meta tags --- */
 
             body = HTMLParser.parse(html);
             microdata = microdataParser.toJson(html);
+            metatags = body.querySelectorAll('meta');
 
-            /* --- Get og:title --- */
+            // console.log('microdata:', JSON.stringify(microdata, null, 2));
 
-            meta = body.querySelectorAll('meta');
 
-            title = _.reduce(meta, function(retval, tag) {
-                if (-~tag.rawAttrs.indexOf('og:title')) {
-                    var attrs = tag.rawAttrs.match(/(\w+)=("[^<>"]*"|'[^<>']*'|\w+)/g),
-                        attrsObj = _.reduce(attrs, function(retval, attr) {
-                            var key = attr.match(/(.+)=/)[1],
-                                val = attr.match(/="(.+)"/)[1];
+            /* --- Get title --- */
 
-                            retval[key] = val;
-                            return retval;
-                        }, {});
+            if (hostInfo.title.opengraph) {
+                retData.title = opengraph(metatags, hostInfo.title.opengraph);
+            } else if (hostInfo.title.selector) {
+                var el = body.querySelector(hostInfo.title.selector);
+                retData.title = el.childNodes[0].rawText;
+            }
 
-                    retval = attrsObj.content;
-                }
+            /* --- Get image --- */
 
-                return retval;
-            }, '');
+            if (hostInfo.image.opengraph) {
+                retData.image = opengraph(metatags, hostInfo.image.opengraph);
+            } else if (hostInfo.image.selector) {
+                var el = body.querySelector(hostInfo.image.selector),
+                    attr = hostInfo.image.attr || 'src';
 
-            retData.title = title;
+                retData.image = parseAttrs(el.rawAttrs)[attr];
+            }
 
-            /* --- Get price and currency ---*/
+            /* --- Get canonical URL --- */
 
-            retData.price = ns.get(microdata, hostInfo.price.microdata);
-            retData.priceCurrency = ns.get(microdata, hostInfo.priceCurrency.microdata);
+            if (hostInfo.url.opengraph) {
+                retData.url = opengraph(metatags, hostInfo.url.opengraph);
+            } else if (hostInfo.url.link) {
+                retData.url = getbytag(body.querySelectorAll('link'), hostInfo.url.link, hostInfo.url.attr);
+            }
+
+            /* --- Get price ---*/
+
+            if (hostInfo.price.microdata) {
+                retData.price = ns.get(microdata, hostInfo.price.microdata);
+            } else if (hostInfo.price.selector) {
+                var el = body.querySelector(hostInfo.price.selector);
+                retData.price = el.childNodes[0].rawText.match(/\d+.?\d?\d?/)[0];
+            }
+
+            /* --- Get currency ---*/
+
+            if (hostInfo.priceCurrency.microdata) {
+                retData.priceCurrency = ns.get(microdata, hostInfo.priceCurrency.microdata);
+            } else {
+                retData.priceCurrency = hostInfo.priceCurrency.default;
+            }
+
 
             def.resolve(retData);
 
         } else {
-            def.reject(new Error("Foo"));
+            def.reject(error);
         }
     });
 
     return def.promise;
 }
-
-
-
-
-
-
-
-/*
-
-Return:
-canonical
-title
-price
-price currency
-image URL
-
-*/
