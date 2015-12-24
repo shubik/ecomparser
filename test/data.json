@@ -1,4 +1,24 @@
 {
+    "www.amazon.com" : {
+        "title" : {
+            "selector" : "#productTitle"
+        },
+        "url" : {
+            "selector" : "link[rel=\"canonical\"]",
+            "attr" : "href"
+        },
+        "image" : {
+            "selector" : "#landingImage",
+            "attr" : "data-old-hires"
+        },
+        "price" : {
+            "selector" : "#priceblock_ourprice"
+        },
+        "priceCurrency" : {
+            "default"  : "USD"
+        }
+    },
+
     "www.citrus.ua" : {
         "title" : {
             "selector"  : "meta[property=\"og:title\"]",
@@ -107,23 +127,24 @@
         }
     },
 
-    "www.amazon.com" : {
+    "fotomag.com.ua" : {
         "title" : {
-            "selector" : "#productTitle"
+            "selector"  : ".top_h1 h1"
         },
         "url" : {
             "selector" : "link[rel=\"canonical\"]",
             "attr" : "href"
         },
         "image" : {
-            "selector" : "#landingImage",
-            "attr" : "data-old-hires"
+            "selector"  : "#main_image",
+            "attr" : "src"
         },
         "price" : {
-            "selector" : "#priceblock_ourprice"
+            "microdata" : "items.0.properties.offers.0.properties.price.0"
         },
         "priceCurrency" : {
-            "default"  : "USD"
+            "microdata" : "items.0.properties.offers.0.properties.priceCurrency.0",
+            "default"  : "UAH"
         }
     }
 }

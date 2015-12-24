@@ -49,6 +49,9 @@ module.exports = function(url, siteData) {
                 $body     = cheerio.load(html),
                 microdata = microdataParser.toJson(html);
 
+
+            // console.log('microdata:', JSON.stringify(microdata, null, 2));
+
             /* --- Set default values --- */
 
             retData.url           = url;
@@ -60,15 +63,33 @@ module.exports = function(url, siteData) {
 
             /* --- Get title --- */
 
-            retData.title = $body(hostInfo.title.selector).attr(hostInfo.title.attr);
+            if (hostInfo.title.attr) {
+                retData.title = $body(hostInfo.title.selector).attr(hostInfo.title.attr);
+            } else {
+                retData.title = $body(hostInfo.title.selector).text();
+            }
+
+            // retData.title = $body(hostInfo.title.selector).attr(hostInfo.title.attr);
 
             /* --- Get image --- */
 
-            retData.image = $body(hostInfo.image.selector).attr(hostInfo.image.attr);
+            if (hostInfo.image.attr) {
+                retData.image = $body(hostInfo.image.selector).attr(hostInfo.image.attr);
+            } else {
+                retData.image = $body(hostInfo.image.selector).text();
+            }
+
+            // retData.image = $body(hostInfo.image.selector).attr(hostInfo.image.attr);
 
             /* --- Get canonical URL --- */
 
-            retData.url = $body(hostInfo.url.selector).attr(hostInfo.url.attr) || url;
+            if (hostInfo.url.attr) {
+                retData.url = $body(hostInfo.url.selector).attr(hostInfo.url.attr) || url;
+            } else {
+                retData.url = $body(hostInfo.url.selector).text() || url;
+            }
+
+            // retData.url = $body(hostInfo.url.selector).attr(hostInfo.url.attr) || url;
 
             /* --- Get price ---*/
 
@@ -91,14 +112,12 @@ module.exports = function(url, siteData) {
                 retData.priceCurrency = ns.get(microdata, hostInfo.priceCurrency.microdata);
             } else if (hostInfo.priceCurrency.selector) {
 
-                switch (hostInfo.priceCurrency.attr) {
-                    case 'text':
-                        retData.priceCurrency = $body(hostInfo.priceCurrency.selector).text();
-                        break;
-
-                    default:
-                        retData.priceCurrency = $body(hostInfo.priceCurrency.selector).attr(hostInfo.priceCurrency.attr);
+                if (hostInfo.priceCurrency.attr) {
+                    retData.priceCurrency = $body(hostInfo.priceCurrency.selector).attr(hostInfo.priceCurrency.attr);
+                } else {
+                    retData.priceCurrency = $body(hostInfo.priceCurrency.selector).text();
                 }
+
             } else {
                 retData.priceCurrency = hostInfo.priceCurrency.default;
             }
