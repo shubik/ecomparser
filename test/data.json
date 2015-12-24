@@ -146,5 +146,45 @@
             "microdata" : "items.0.properties.offers.0.properties.priceCurrency.0",
             "default"  : "UAH"
         }
+    },
+
+    "f.ua" : {
+        "title" : {
+            "selector"  : "meta[property=\"og:title\"]",
+            "attr" : "content"
+        },
+        "url" : {
+            "selector"  : "meta[property=\"og:url\"]",
+            "attr" : "content"
+        },
+        "image" : {
+            "selector"  : "meta[property=\"og:image\"]",
+            "attr" : "content"
+        },
+        "price" : {
+            "microdata" : "items.2.properties.offers.0.properties.price.0"
+        },
+        "priceCurrency" : {
+            "microdata" : "items.2.properties.offers.0.properties.priceCurrency.0",
+            "default"  : "UAH"
+        }
+    },
+
+    "www.mobilluck.com.ua" : {
+        "title" : {
+            "selector"  : ".mgood_title"
+        },
+        "url" : null,
+        "image" : {
+            "selector"  : "#main_view",
+            "attr" : "src"
+        },
+        "price" : {
+            "selector"  : "[itemprop=\"price\"]"
+        },
+        "priceCurrency" : {
+            "selector"  : "[itemprop=\"currency\"]",
+            "attr" : "content"
+        }
     }
 }

@@ -58,9 +58,27 @@ var ecomparser = require('../index'),
 // });
 
 
-var fotomag = ecomparser('http://fotomag.com.ua/apple-ipad-mini-2-with-retina-display-32gb-wi-fi-4g-(me820tu-a)-space-grey-info.html', siteData);
+// var fotomag = ecomparser('http://fotomag.com.ua/apple-ipad-mini-2-with-retina-display-32gb-wi-fi-4g-(me820tu-a)-space-grey-info.html', siteData);
 
-fotomag.done(function(val) {
+// fotomag.done(function(val) {
+//     console.log('Done!', val);
+// }, function(err) {
+//     console.log('Failed!');
+// });
+
+
+// var fua = ecomparser('https://f.ua/philips/hd9046-90.html', siteData);
+
+// fua.done(function(val) {
+//     console.log('Done!', val);
+// }, function(err) {
+//     console.log('Failed!');
+// });
+
+
+var mobilluck = ecomparser('http://www.mobilluck.com.ua/katalog/LCDTV/Saturn/Saturn-LED46KF-334620.html', siteData);
+
+mobilluck.done(function(val) {
     console.log('Done!', val);
 }, function(err) {
     console.log('Failed!');

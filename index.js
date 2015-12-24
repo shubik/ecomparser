@@ -9,6 +9,7 @@ var _               = require('lodash'),
 
 
 function parseNumber(str) {
+    console.log('parseNumber()', str);
     return str.match(/(\d+).? ?(\d+)/)[0].replace(' ','');
 }
 
@@ -75,6 +76,10 @@ module.exports = function(url, siteData) {
 
             html = decodeHTML(html);
 
+            /* --- Set page's hostname --- */
+
+            retData.hostname = URLParser.parse(url).hostname;
+
             var hostInfo  = getHostInfo(siteData, retData.hostname),
                 $page     = cheerio.load(html),
                 microdata = microdataParser.toJson(html);
@@ -82,7 +87,6 @@ module.exports = function(url, siteData) {
 
             /* --- Set default values --- */
 
-            retData.hostname      = URLParser.parse(url).hostname;
             retData.url           = url;
             retData.title         = null;
             retData.image         = null;
@@ -92,35 +96,46 @@ module.exports = function(url, siteData) {
 
             /* --- Get title --- */
 
-            if (hostInfo.title.attr) {
-                retData.title = $page(hostInfo.title.selector).attr(hostInfo.title.attr);
-            } else {
-                retData.title = $page(hostInfo.title.selector).text();
+            if (hostInfo.title && hostInfo.title.selector) {
+                if (hostInfo.title.attr) {
+                    retData.title = $page(hostInfo.title.selector).attr(hostInfo.title.attr);
+                } else {
+                    retData.title = $page(hostInfo.title.selector).text();
+                }
             }
 
 
             /* --- Get image --- */
 
-            if (hostInfo.image.attr) {
-                retData.image = $page(hostInfo.image.selector).attr(hostInfo.image.attr);
-            } else {
-                retData.image = $page(hostInfo.image.selector).text();
+            if (hostInfo.image && hostInfo.image.selector) {
+                if (hostInfo.image.attr) {
+                    retData.image = $page(hostInfo.image.selector).attr(hostInfo.image.attr);
+                } else {
+                    retData.image = $page(hostInfo.image.selector).text();
+                }
             }
 
 
             /* --- Get canonical URL --- */
 
-            if (hostInfo.url.attr) {
-                retData.url = $page(hostInfo.url.selector).attr(hostInfo.url.attr) || url;
-            } else {
-                retData.url = $page(hostInfo.url.selector).text() || url;
+            if (hostInfo.url && hostInfo.url.selector) {
+                if (hostInfo.url.attr) {
+                    retData.url = $page(hostInfo.url.selector).attr(hostInfo.url.attr) || url;
+                } else {
+                    retData.url = $page(hostInfo.url.selector).text() || url;
+                }
             }
 
 
             /* --- Get price ---*/
 
-            if (hostInfo.price.microdata) {
-                retData.price = parseNumber(ns.get(microdata, hostInfo.price.microdata));
+            if (hostInfo.price && hostInfo.price.microdata) {
+                try {
+                    retData.price = parseNumber(ns.get(microdata, hostInfo.price.microdata));
+                } catch (err) {
+                    console.log('get price for failed:', err);
+                    console.log('microdata:', JSON.stringify(ns.get(microdata, 'items'), null, 2));
+                }
             } else if (hostInfo.price.selector) {
 
                 if (hostInfo.price.attr) {
@@ -128,13 +143,12 @@ module.exports = function(url, siteData) {
                 } else {
                     retData.price = parseNumber($page(hostInfo.price.selector).text());
                 }
-
             }
 
 
             /* --- Get currency ---*/
 
-            if (hostInfo.priceCurrency.microdata) {
+            if (hostInfo.priceCurrency && hostInfo.priceCurrency.microdata) {
                 retData.priceCurrency = ns.get(microdata, hostInfo.priceCurrency.microdata);
             } else if (hostInfo.priceCurrency.selector) {
 
