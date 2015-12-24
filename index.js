@@ -8,7 +8,7 @@ var _               = require('lodash'),
     ns              = require('./lib/ns');
 
 
-function parseNum(str) {
+function parseNumber(str) {
     return str.match(/(\d+).? ?(\d+)/)[0].replace(' ','');
 }
 
@@ -39,7 +39,7 @@ function decodeHTML(html) {
 
     switch (charset) {
         case 'windows-1251':
-            decoded = windows1251.decode(html);
+            decoded = windows1251.decode(html, { 'mode': 'html' });
             break;
 
         default:
@@ -62,11 +62,11 @@ module.exports = function(url, siteData) {
             }
         };
 
-    request(reqOpts, function (error, response, html) {
-        var retData  = {},
-            charset;
 
-        retData.hostname = URLParser.parse(url).hostname;
+    /* --- Try loading and parsing page --- */
+
+    request(reqOpts, function (error, response, html) {
+        var retData = {};
 
 
         if (!error && response.statusCode == 200) {
@@ -75,7 +75,6 @@ module.exports = function(url, siteData) {
 
             html = decodeHTML(html);
 
-
             var hostInfo  = getHostInfo(siteData, retData.hostname),
                 $page     = cheerio.load(html),
                 microdata = microdataParser.toJson(html);
@@ -83,6 +82,7 @@ module.exports = function(url, siteData) {
 
             /* --- Set default values --- */
 
+            retData.hostname      = URLParser.parse(url).hostname;
             retData.url           = url;
             retData.title         = null;
             retData.image         = null;
@@ -98,7 +98,6 @@ module.exports = function(url, siteData) {
                 retData.title = $page(hostInfo.title.selector).text();
             }
 
-            // retData.title = $page(hostInfo.title.selector).attr(hostInfo.title.attr);
 
             /* --- Get image --- */
 
@@ -108,7 +107,6 @@ module.exports = function(url, siteData) {
                 retData.image = $page(hostInfo.image.selector).text();
             }
 
-            // retData.image = $page(hostInfo.image.selector).attr(hostInfo.image.attr);
 
             /* --- Get canonical URL --- */
 
@@ -118,18 +116,17 @@ module.exports = function(url, siteData) {
                 retData.url = $page(hostInfo.url.selector).text() || url;
             }
 
-            // retData.url = $page(hostInfo.url.selector).attr(hostInfo.url.attr) || url;
 
             /* --- Get price ---*/
 
             if (hostInfo.price.microdata) {
-                retData.price = parseNum(ns.get(microdata, hostInfo.price.microdata));
+                retData.price = parseNumber(ns.get(microdata, hostInfo.price.microdata));
             } else if (hostInfo.price.selector) {
 
                 if (hostInfo.price.attr) {
-                    retData.price = parseNum($page(hostInfo.price.selector).attr(hostInfo.price.attr));
+                    retData.price = parseNumber($page(hostInfo.price.selector).attr(hostInfo.price.attr));
                 } else {
-                    retData.price = parseNum($page(hostInfo.price.selector).text());
+                    retData.price = parseNumber($page(hostInfo.price.selector).text());
                 }
 
             }
@@ -150,10 +147,6 @@ module.exports = function(url, siteData) {
             } else {
                 retData.priceCurrency = hostInfo.priceCurrency.default;
             }
-
-            /* --- Make sure necessary string values are decoded --- */
-
-            // retData.title = decode(retData.title, charset);
 
 
             /* --- Resolve deferred --- */
