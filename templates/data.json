@@ -76,16 +76,20 @@
 
     "www.eldorado.com.ua" : {
         "title" : {
-            "opengraph" : "title"
+            "selector"  : "meta[property=\"og:title\"]",
+            "attr" : "content"
         },
         "url" : {
-            "opengraph" : "url"
+            "selector"  : "meta[property=\"og:url\"]",
+            "attr" : "content"
         },
         "image" : {
-            "opengraph" : "image"
+            "selector"  : "meta[property=\"og:image\"]",
+            "attr" : "content"
         },
         "price" : {
-            "selector" : ".price-new div span"
+            "selector" : "span[property=\"v:pricerange\"]",
+            "attr"     : "innerText"
         },
         "priceCurrency" : {
             "default"  : "UAH"

@@ -1,8 +1,8 @@
 var _               = require('lodash'),
     request         = require('request'),
     URLParser       = require('url'),
-    HTMLParser      = require('fast-html-parser'),
-    microdataParser = require('microdata-node'),
+    // HTMLParser      = require('fast-html-parser'),
+    // microdataParser = require('microdata-node'),
     deferred        = require('deferred'),
     cheerio         = require('cheerio'),
     ns              = require('./lib/ns'),
@@ -63,61 +63,45 @@ module.exports = function(url, siteData) {
 
             /* --- Parse page and meta tags --- */
 
-            body      = HTMLParser.parse(html);
-            microdata = microdataParser.toJson(html);
-            metatags  = body.querySelectorAll('meta');
-            $body     = cheerio.load(html);
+            $body = cheerio.load(html);
 
 
             // console.log('PRICE:', ns.get(microdata, 'items.0.properties.offers.0.properties.price.0'));
-            console.log('$ URL:', $body('meta[property="og:url"]').attr('content'));
-            console.log('$ PRICE:', $body('span[property="v:pricerange"]').text());
+            // console.log('$ URL:', $body('meta[property="og:url"]').attr('content'));
+            // console.log('$ PRICE:', $body('span[property="v:pricerange"]').text());
 
 
             /* --- Get title --- */
 
-            if (hostInfo.title.opengraph) {
-                retData.title = opengraph(metatags, hostInfo.title.opengraph);
-            } else if (hostInfo.title.selector) {
-                var el = body.querySelector(hostInfo.title.selector);
-                retData.title = el.childNodes[0].rawText;
-            }
+            retData.title = $body(hostInfo.title.selector).attr(hostInfo.title.attr);
 
-            /* --- Get image --- */
+            // /* --- Get image --- */
 
-            if (hostInfo.image.opengraph) {
-                retData.image = opengraph(metatags, hostInfo.image.opengraph);
-            } else if (hostInfo.image.selector) {
-                var el = body.querySelector(hostInfo.image.selector),
-                    attr = hostInfo.image.attr || 'src';
+            retData.image = $body(hostInfo.image.selector).attr(hostInfo.image.attr);
 
-                retData.image = parseAttrs(el.rawAttrs)[attr];
-            }
+            // /* --- Get canonical URL --- */
 
-            /* --- Get canonical URL --- */
+            retData.url = $body(hostInfo.url.selector).attr(hostInfo.url.attr);
 
-            if (hostInfo.url.opengraph) {
-                retData.url = opengraph(metatags, hostInfo.url.opengraph);
-            } else if (hostInfo.url.link) {
-                retData.url = getbytag(body.querySelectorAll('link'), hostInfo.url.link, hostInfo.url.attr);
-            }
+            // /* --- Get price ---*/
 
-            /* --- Get price ---*/
+            retData.price = $body(hostInfo.price.selector).attr(hostInfo.price.attr);
 
-            if (hostInfo.price.microdata) {
-                retData.price = parseDecimal(ns.get(microdata, hostInfo.price.microdata));
-            } else if (hostInfo.price.selector) {
-                var el = body.querySelector(hostInfo.price.selector);
-                retData.price = parseDecimal(el.childNodes[0].rawText);
-            }
 
-            /* --- Get currency ---*/
+            // if (hostInfo.price.microdata) {
+            //     retData.price = parseDecimal(ns.get(microdata, hostInfo.price.microdata));
+            // } else if (hostInfo.price.selector) {
+            //     var el = body.querySelector(hostInfo.price.selector);
+            //     retData.price = parseDecimal(el.childNodes[0].rawText);
+            // }
 
-            if (hostInfo.priceCurrency.microdata) {
-                retData.priceCurrency = ns.get(microdata, hostInfo.priceCurrency.microdata);
-            } else {
-                retData.priceCurrency = hostInfo.priceCurrency.default;
-            }
+            // /* --- Get currency ---*/
+
+            // if (hostInfo.priceCurrency.microdata) {
+            //     retData.priceCurrency = ns.get(microdata, hostInfo.priceCurrency.microdata);
+            // } else {
+            //     retData.priceCurrency = hostInfo.priceCurrency.default;
+            // }
 
 
             def.resolve(retData);
