@@ -1,17 +1,11 @@
 var _               = require('lodash'),
     request         = require('request'),
     URLParser       = require('url'),
-    // HTMLParser      = require('fast-html-parser'),
-    // microdataParser = require('microdata-node'),
     deferred        = require('deferred'),
-    cheerio         = require('cheerio'),
-    ns              = require('./lib/ns'),
-    opengraph       = require('./lib/og'),
-    getbytag        = require('./lib/getbytag'),
-    parseAttrs      = require('./lib/parseAttrs');
+    cheerio         = require('cheerio');
 
 
-function parseDecimal(str) {
+function parseFloat(str) {
     return str.match(/(\d+).? ?(\d+)/)[0].replace(' ','');
 }
 
@@ -49,9 +43,7 @@ module.exports = function(url, siteData) {
 
         if (!error && response.statusCode == 200) {
             var hostInfo = getHostInfo(siteData, retData.hostname),
-                body,
-                microdata,
-                metatags;
+                $body    = cheerio.load(html);
 
             /* --- Set default values --- */
 
@@ -61,41 +53,37 @@ module.exports = function(url, siteData) {
             retData.price         = null;
             retData.priceCurrency = null;
 
-            /* --- Parse page and meta tags --- */
-
-            $body = cheerio.load(html);
-
-
-            // console.log('PRICE:', ns.get(microdata, 'items.0.properties.offers.0.properties.price.0'));
-            // console.log('$ URL:', $body('meta[property="og:url"]').attr('content'));
-            // console.log('$ PRICE:', $body('span[property="v:pricerange"]').text());
-
 
             /* --- Get title --- */
 
             retData.title = $body(hostInfo.title.selector).attr(hostInfo.title.attr);
 
-            // /* --- Get image --- */
+            /* --- Get image --- */
 
             retData.image = $body(hostInfo.image.selector).attr(hostInfo.image.attr);
 
-            // /* --- Get canonical URL --- */
+            /* --- Get canonical URL --- */
 
             retData.url = $body(hostInfo.url.selector).attr(hostInfo.url.attr);
 
-            // /* --- Get price ---*/
+            /* --- Get price ---*/
 
-            retData.price = $body(hostInfo.price.selector).attr(hostInfo.price.attr);
+            switch (hostInfo.price.attr) {
+                case 'text':
+                    retData.price = parseFloat($body(hostInfo.price.selector).text());
+                    break;
 
+                default:
+                    retData.price = parseFloat($body(hostInfo.price.selector).attr(hostInfo.price.attr));
+            }
 
-            // if (hostInfo.price.microdata) {
-            //     retData.price = parseDecimal(ns.get(microdata, hostInfo.price.microdata));
-            // } else if (hostInfo.price.selector) {
-            //     var el = body.querySelector(hostInfo.price.selector);
-            //     retData.price = parseDecimal(el.childNodes[0].rawText);
-            // }
+            /* --- Get currency ---*/
 
-            // /* --- Get currency ---*/
+            if (hostInfo.priceCurrency.selector) {
+                retData.priceCurrency = $body(hostInfo.url.selector).attr(hostInfo.url.attr);
+            } else {
+                retData.priceCurrency = hostInfo.priceCurrency.default;
+            }
 
             // if (hostInfo.priceCurrency.microdata) {
             //     retData.priceCurrency = ns.get(microdata, hostInfo.priceCurrency.microdata);

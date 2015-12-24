@@ -89,7 +89,7 @@
         },
         "price" : {
             "selector" : "span[property=\"v:pricerange\"]",
-            "attr"     : "innerText"
+            "attr"     : "text"
         },
         "priceCurrency" : {
             "default"  : "UAH"
