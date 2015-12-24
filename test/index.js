@@ -1,5 +1,5 @@
 var ecomparser = require('../index'),
-    siteData   = require('../templates/data.json');
+    siteData   = require('./data.json');
 
 
 
