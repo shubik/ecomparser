@@ -246,5 +246,42 @@
         "priceCurrency" : {
             "default"  : "UAH"
         }
+    },
+
+    "ilounge.com.ua" : {
+        "title" : {
+            "selector"  : "meta[property=\"og:title\"]",
+            "attr" : "content"
+        },
+        "url" : null,
+        "image" : {
+            "selector"  : "meta[property=\"og:image\"]",
+            "attr" : "content"
+        },
+        "price" : {
+            "microdata" : "items.0.properties.offerDetails.0.properties.price.0"
+        },
+        "priceCurrency" : {
+            "microdata" : "items.0.properties.offerDetails.0.properties.currency.0",
+            "default"  : "UAH"
+        }
+    },
+
+    "www.moyo.ua" : {
+        "title" : {
+            "selector"  : "meta[property=\"og:title\"]",
+            "attr" : "content"
+        },
+        "url" : null,
+        "image" : {
+            "microdata"  : "items.5.properties.image.0"
+        },
+        "price" : {
+            "microdata" : "items.5.properties.offers.0.properties.price.0"
+        },
+        "priceCurrency" : {
+            "microdata" : "items.5.properties.offers.0.properties.priceCurrency.0",
+            "default"  : "UAH"
+        }
     }
 }

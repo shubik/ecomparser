@@ -80,9 +80,11 @@ module.exports = function(url, siteData) {
 
         if (!error && response.statusCode == 200) {
 
-            var hostInfo,
+            var parsedURL = URLParser.parse(url),
+                hostInfo,
                 $page,
-                microdata;
+                microdata,
+                parsedImgURL;
 
 
             /* --- Detect character encoding and decode HTML if necessary --- */
@@ -91,13 +93,16 @@ module.exports = function(url, siteData) {
 
             /* --- Set page's hostname --- */
 
-            retData.hostname = URLParser.parse(url).hostname;
+            retData.hostname = parsedURL.hostname;
             hostInfo  = getHostInfo(siteData, retData.hostname);
 
             if (!hostInfo) return def.reject(new Error('Host info is not defined for ' + retData.hostname));
 
             $page     = cheerio.load(html);
             microdata = microdataParser.toJson(html);
+
+
+            // console.log('microdata:', JSON.stringify(ns.get(microdata, 'items.5.properties.image'), null, 2));
 
 
             /* --- Set default values --- */
@@ -124,12 +129,25 @@ module.exports = function(url, siteData) {
 
             /* --- Get image --- */
 
-            if (hostInfo.image && hostInfo.image.selector) {
+            if (hostInfo.image && hostInfo.image.microdata) {
+                retData.image = ns.get(microdata, hostInfo.image.microdata);
+            } else if (hostInfo.image.selector) {
                 if (hostInfo.image.attr) {
                     retData.image = $page(hostInfo.image.selector).attr(hostInfo.image.attr);
                 } else {
                     retData.image = $page(hostInfo.image.selector).text();
                 }
+            }
+
+
+            /* --- Fix images with relative URLs --- */
+
+            parsedImgURL = URLParser.parse(retData.image);
+
+            if (parsedImgURL.host === null) {
+                parsedImgURL.protocol = parsedURL.protocol;
+                parsedImgURL.host = parsedURL.host;
+                retData.image = URLParser.format(parsedImgURL);
             }
 
 
@@ -151,7 +169,7 @@ module.exports = function(url, siteData) {
                     retData.price = parseNumber(ns.get(microdata, hostInfo.price.microdata));
                 } catch (err) {
                     console.warn('Parsing price failed for', hostInfo.price.microdata);
-                    console.log('microdata:', JSON.stringify(ns.get(microdata, 'items'), null, 2));
+                    // console.log('microdata:', JSON.stringify(ns.get(microdata, 'items'), null, 2));
                 }
             } else if (hostInfo.price.selector) {
 
