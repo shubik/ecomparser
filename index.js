@@ -17,6 +17,20 @@ function parseDecimal(str) {
 }
 
 
+function getHostInfo(hostname, siteData) {
+    var retval = _.reduce(siteData, function(memo, data, host) {
+        var reStr = host.replace('*', '.+?'),
+            re = new RegExp(reStr),
+            matches = hostname.match(re);
+
+        if (matches !== null) memo = data;
+        return memo;
+    }, null);
+
+    return retval;
+}
+
+
 module.exports = function(url, siteData) {
     var def = deferred();
 
@@ -28,8 +42,7 @@ module.exports = function(url, siteData) {
         retData.hostname = hostname;
 
         if (!error && response.statusCode == 200) {
-
-            var hostInfo = siteData[hostname],
+            var hostInfo = getHostInfo(hostname, siteData),
                 body,
                 microdata,
                 metatags;

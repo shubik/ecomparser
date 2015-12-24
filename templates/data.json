@@ -37,7 +37,7 @@
         }
     },
 
-    "hard.rozetka.com.ua" : {
+    "*.rozetka.com.ua" : {
         "title" : {
             "opengraph" : "title"
         },
