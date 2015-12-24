@@ -68,7 +68,7 @@ module.exports = function(url, siteData) {
 
             /* --- Get canonical URL --- */
 
-            retData.url = $body(hostInfo.url.selector).attr(hostInfo.url.attr);
+            retData.url = $body(hostInfo.url.selector).attr(hostInfo.url.attr) || url;
 
             /* --- Get price ---*/
 
@@ -107,7 +107,7 @@ module.exports = function(url, siteData) {
             def.resolve(retData);
 
         } else {
-            console.log('FAILED:', url, error);
+            console.log('FAILED:', url, error, html);
             def.reject(error);
         }
     });

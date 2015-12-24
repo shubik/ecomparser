@@ -22,7 +22,7 @@ allo.done(function(val) {
 });
 
 
-var amazon = ecomparser('http://www.amazon.com/gp/product/B00CXMO02W/ref=s9_simh_gw_p79_d0_i3?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=desktop-1&pf_rd_r=1GKM6C6JP5PNPQKFH9JX&pf_rd_t=36701&pf_rd_p=2079475242', siteData);
+var amazon = ecomparser('http://www.amazon.com/gp/product/B00EQRN9VA/ref=s9_simh_gw_p107_d5_i3?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=desktop-3&pf_rd_r=137C2X1V7567Z9NSKR5G&pf_rd_t=36701&pf_rd_p=2084660942&pf_rd_i=desktop', siteData);
 
 amazon.done(function(val) {
     console.log('Done!', val);
