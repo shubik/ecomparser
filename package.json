@@ -6,9 +6,12 @@
   "dependencies": {
     "cheerio": "^0.19.0",
     "deferred": "^0.7.4",
+    "install": "^0.4.1",
     "lodash": "2.4.1",
     "microdata-node": "^0.2.1",
-    "request": "^2.62.0"
+    "npm": "^3.5.2",
+    "request": "^2.62.0",
+    "windows-1251": "^0.1.2"
   },
   "devDependencies": {}
 }
