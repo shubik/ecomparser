@@ -169,7 +169,7 @@ module.exports = function(url, siteData) {
                     retData.price = parseNumber(ns.get(microdata, hostInfo.price.microdata));
                 } catch (err) {
                     console.warn('Parsing price failed for', hostInfo.price.microdata);
-                    // console.log('microdata:', JSON.stringify(ns.get(microdata, 'items'), null, 2));
+                    console.log('microdata:', JSON.stringify(ns.get(microdata, 'items'), null, 2));
                 }
             } else if (hostInfo.price.selector) {
 

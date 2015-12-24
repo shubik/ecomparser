@@ -121,9 +121,36 @@ var ecomparser = require('../index'),
 // });
 
 
-var moyo = ecomparser('http://www.moyo.ua/mobilnyj-telefon-apple-iphone-6-16-gb-space-gray/73606.html', siteData);
+// var moyo = ecomparser('http://www.moyo.ua/mobilnyj-telefon-apple-iphone-6-16-gb-space-gray/73606.html', siteData);
 
-moyo.done(function(data) {
+// moyo.done(function(data) {
+//     console.log(data);
+// }, function(err) {
+//     console.log(err.toString());
+// });
+
+
+// var itbox = ecomparser('http://www.itbox.ua/product/Cifrovoy_fotoapparat_Canon_PowerShot_SX400_IS_Red_9769B012-p165404/', siteData);
+
+// itbox.done(function(data) {
+//     console.log(data);
+// }, function(err) {
+//     console.log(err.toString());
+// });
+
+
+// var telemart = ecomparser('http://telemart.ua/products/fly-fs501-nimbus-3-black/', siteData);
+
+// telemart.done(function(data) {
+//     console.log(data);
+// }, function(err) {
+//     console.log(err.toString());
+// });
+
+
+var citycomua = ecomparser('http://city.com.ua/goods/tablets/asus-memo-pad-7-me70c-8gb-black.html', siteData);
+
+citycomua.done(function(data) {
     console.log(data);
 }, function(err) {
     console.log(err.toString());

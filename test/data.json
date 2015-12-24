@@ -283,5 +283,66 @@
             "microdata" : "items.5.properties.offers.0.properties.priceCurrency.0",
             "default"  : "UAH"
         }
+    },
+
+    "www.itbox.ua" : {
+        "title" : {
+            "selector"  : "meta[property=\"og:title\"]",
+            "attr" : "content"
+        },
+        "url" : {
+            "selector"  : "meta[property=\"og:url\"]",
+            "attr" : "content"
+        },
+        "image" : {
+            "selector"  : "meta[property=\"og:image\"]",
+            "attr" : "content"
+        },
+        "price" : {
+            "microdata" : "items.3.properties.offers.0.properties.price.0"
+        },
+        "priceCurrency" : {
+            "microdata" : "items.3.properties.offers.0.properties.priceCurrency.0",
+            "default"  : "UAH"
+        }
+    },
+
+    "telemart.ua" : {
+        "title" : {
+            "selector"  : "[itemprop=\"name\"]"
+        },
+        "url" : {
+            "selector" : "link[rel=\"canonical\"]",
+            "attr" : "href"
+        },
+        "image" : {
+            "selector"  : "#big_img",
+            "attr" : "src"
+        },
+        "price" : {
+            "selector" : "[itemprop=\"price\"]"
+        },
+        "priceCurrency" : {
+            "selector" : "[itemprop=\"priceCurrency\"]",
+            "attr" : "content",
+            "default"  : "UAH"
+        }
+    },
+
+    "city.com.ua" : {
+        "title" : {
+            "selector"  : ".main_product_block h1"
+        },
+        "url" : null,
+        "image" : {
+            "selector"  : ".top_img img",
+            "attr" : "src"
+        },
+        "price" : {
+            "selector" : ".current_price"
+        },
+        "priceCurrency" : {
+            "default"  : "UAH"
+        }
     }
 }
