@@ -3,6 +3,15 @@ var ecomparser = require('../index'),
 
 
 
+// var amazon = ecomparser('http://www.amazon.com/gp/product/B00EQRN9VA/ref=s9_simh_gw_p107_d5_i3?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=desktop-3&pf_rd_r=137C2X1V7567Z9NSKR5G&pf_rd_t=36701&pf_rd_p=2084660942&pf_rd_i=desktop', siteData);
+
+// amazon.done(function(val) {
+//     console.log('Done!', val);
+// }, function(err) {
+//     console.log('Failed!', err);
+// });
+
+
 // var citrus = ecomparser('http://www.citrus.ua/shop/goods/tabletpc/262/248181', siteData);
 
 // citrus.done(function(val) {
@@ -16,15 +25,6 @@ var ecomparser = require('../index'),
 // var allo = ecomparser('http://allo.ua/ru/products/mobile/apple-iphone-6-16gb-gold.html', siteData);
 
 // allo.done(function(val) {
-//     console.log('Done!', val);
-// }, function(err) {
-//     console.log('Failed!', err);
-// });
-
-
-// var amazon = ecomparser('http://www.amazon.com/gp/product/B00EQRN9VA/ref=s9_simh_gw_p107_d5_i3?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=desktop-3&pf_rd_r=137C2X1V7567Z9NSKR5G&pf_rd_t=36701&pf_rd_p=2084660942&pf_rd_i=desktop', siteData);
-
-// amazon.done(function(val) {
 //     console.log('Done!', val);
 // }, function(err) {
 //     console.log('Failed!', err);
@@ -85,9 +85,18 @@ var ecomparser = require('../index'),
 // });
 
 
-var deshevshe = ecomparser('http://deshevshe.net.ua/monoblocks-asus/asus_zen_aio_pro_z240icgt_gj079x_90pt01e', siteData);
+// var deshevshe = ecomparser('http://deshevshe.net.ua/monoblocks-asus/asus_zen_aio_pro_z240icgt_gj079x_90pt01e', siteData);
 
-deshevshe.done(function(val) {
+// deshevshe.done(function(val) {
+//     console.log('Done!', val);
+// }, function(err) {
+//     console.log('Failed!');
+// });
+
+
+var comfy = ecomparser('http://comfy.ua/televizor-finlux-32-flyr-274s.html', siteData);
+
+comfy.done(function(val) {
     console.log('Done!', val);
 }, function(err) {
     console.log('Failed!');

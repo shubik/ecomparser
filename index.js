@@ -9,7 +9,6 @@ var _               = require('lodash'),
 
 
 function parseNumber(str) {
-    console.log('parseNumber()', str);
     return str.match(/(\d+).? ?(\d+)/)[0].replace(' ','');
 }
 
@@ -48,6 +47,13 @@ function decodeHTML(html) {
     }
 
     return decoded;
+}
+
+
+function cleanTxt(str) {
+    str = str.replace(/ +(?= )/g, '');
+    str = str.replace(/\r?\n|\r/g, '');
+    return str.trim();
 }
 
 
@@ -105,6 +111,8 @@ module.exports = function(url, siteData) {
                     retData.title = $page(hostInfo.title.selector).text();
                 }
             }
+
+            retData.title = cleanTxt(retData.title);
 
 
             /* --- Get image --- */

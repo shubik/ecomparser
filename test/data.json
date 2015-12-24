@@ -184,7 +184,8 @@
         },
         "priceCurrency" : {
             "selector"  : "[itemprop=\"currency\"]",
-            "attr" : "content"
+            "attr" : "content",
+            "default"  : "UAH"
         }
     },
 
@@ -202,7 +203,28 @@
         },
         "priceCurrency" : {
             "selector"  : "[itemprop=\"priceCurrency\"]",
-            "attr" : "content"
+            "attr" : "content",
+            "default"  : "UAH"
+        }
+    },
+
+    "comfy.ua" : {
+        "title" : {
+            "selector"  : ".product-name"
+        },
+        "url" : {
+            "selector" : "link[rel=\"canonical\"]",
+            "attr" : "href"
+        },
+        "image" : {
+            "selector"  : ".gallery-base__item.active-view img",
+            "attr" : "src"
+        },
+        "price" : {
+            "selector"  : ".price-value"
+        },
+        "priceCurrency" : {
+            "default"  : "UAH"
         }
     }
 }
