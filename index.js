@@ -57,9 +57,11 @@ module.exports = function(url, siteData) {
             url : url,
             headers : {
                 'User-Agent'      : 'curl/7.35.0',
-                'Accept'          : '*',
+                'Accept'          : '*/*',
                 'Accept-Encoding' : '',
-                'Cache-Control'   : 'max-age=0'
+                'Cache-Control'   : 'max-age=0',
+                'Referer'         : 'http://farennikov.com',
+                'Connection'      : 'close'
             }
         };
 

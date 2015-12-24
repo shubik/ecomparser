@@ -76,9 +76,18 @@ var ecomparser = require('../index'),
 // });
 
 
-var mobilluck = ecomparser('http://www.mobilluck.com.ua/katalog/LCDTV/Saturn/Saturn-LED46KF-334620.html', siteData);
+// var mobilluck = ecomparser('http://www.mobilluck.com.ua/katalog/LCDTV/Saturn/Saturn-LED46KF-334620.html', siteData);
 
-mobilluck.done(function(val) {
+// mobilluck.done(function(val) {
+//     console.log('Done!', val);
+// }, function(err) {
+//     console.log('Failed!');
+// });
+
+
+var deshevshe = ecomparser('http://deshevshe.net.ua/monoblocks-asus/asus_zen_aio_pro_z240icgt_gj079x_90pt01e', siteData);
+
+deshevshe.done(function(val) {
     console.log('Done!', val);
 }, function(err) {
     console.log('Failed!');

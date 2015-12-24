@@ -186,5 +186,23 @@
             "selector"  : "[itemprop=\"currency\"]",
             "attr" : "content"
         }
+    },
+
+    "deshevshe.net.ua" : {
+        "title" : {
+            "selector"  : "[itemprop=\"name\"]"
+        },
+        "url" : null,
+        "image" : {
+            "selector"  : "[itemprop=\"image\"]",
+            "attr" : "src"
+        },
+        "price" : {
+            "selector"  : "[itemprop=\"price\"]"
+        },
+        "priceCurrency" : {
+            "selector"  : "[itemprop=\"priceCurrency\"]",
+            "attr" : "content"
+        }
     }
 }
