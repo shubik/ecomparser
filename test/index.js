@@ -39,9 +39,17 @@ var ecomparser = require('../index'),
 //     console.log('Failed!', err);
 // });
 
-var foxtrot = ecomparser('http://www.foxtrot.com.ua/ru/shop/holodilniki_delfa_dbf-150.html', siteData);
+// var foxtrot = ecomparser('http://www.foxtrot.com.ua/ru/shop/holodilniki_delfa_dbf-150.html', siteData);
 
-foxtrot.done(function(val) {
+// foxtrot.done(function(val) {
+//     console.log('Done!', val);
+// }, function(err) {
+//     console.log('Failed!', err);
+// });
+
+var eldorado = ecomparser('http://www.eldorado.com.ua/offer_1366142/p1366142/', siteData);
+
+eldorado.done(function(val) {
     console.log('Done!', val);
 }, function(err) {
     console.log('Failed!', err);

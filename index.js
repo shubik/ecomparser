@@ -4,6 +4,7 @@ var _               = require('lodash'),
     HTMLParser      = require('fast-html-parser'),
     microdataParser = require('microdata-node'),
     deferred        = require('deferred'),
+    cheerio         = require('cheerio'),
     ns              = require('./lib/ns'),
     opengraph       = require('./lib/og'),
     getbytag        = require('./lib/getbytag'),
@@ -62,12 +63,15 @@ module.exports = function(url, siteData) {
 
             /* --- Parse page and meta tags --- */
 
-            body = HTMLParser.parse(html);
+            body      = HTMLParser.parse(html);
             microdata = microdataParser.toJson(html);
-            metatags = body.querySelectorAll('meta');
+            metatags  = body.querySelectorAll('meta');
+            $body     = cheerio.load(html);
 
 
             // console.log('PRICE:', ns.get(microdata, 'items.0.properties.offers.0.properties.price.0'));
+            console.log('$ URL:', $body('meta[property="og:url"]').attr('content'));
+            console.log('$ PRICE:', $body('span[property="v:pricerange"]').text());
 
 
             /* --- Get title --- */
