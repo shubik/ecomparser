@@ -94,9 +94,18 @@ var ecomparser = require('../index'),
 // });
 
 
-var comfy = ecomparser('http://comfy.ua/televizor-finlux-32-flyr-274s.html', siteData);
+// var comfy = ecomparser('http://comfy.ua/televizor-finlux-32-flyr-274s.html', siteData);
 
-comfy.done(function(val) {
+// comfy.done(function(val) {
+//     console.log('Done!', val);
+// }, function(err) {
+//     console.log('Failed!');
+// });
+
+
+var promua = ecomparser('http://prom.ua/p160879155-zimnyaya-kurtka-puhovik.html', siteData);
+
+promua.done(function(val) {
     console.log('Done!', val);
 }, function(err) {
     console.log('Failed!');

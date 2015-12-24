@@ -226,5 +226,25 @@
         "priceCurrency" : {
             "default"  : "UAH"
         }
+    },
+
+    "prom.ua" : {
+        "title" : {
+            "selector"  : ".b-product__name [itemprop=\"name\"]"
+        },
+        "url" : {
+            "selector" : "link[rel=\"canonical\"]",
+            "attr" : "href"
+        },
+        "image" : {
+            "selector"  : "#main_image_container [itemprop=\"image\"]",
+            "attr" : "src"
+        },
+        "price" : {
+            "microdata" : "items.4.properties.offers.0.properties.price.0"
+        },
+        "priceCurrency" : {
+            "default"  : "UAH"
+        }
     }
 }
