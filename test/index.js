@@ -3,13 +3,13 @@ var ecomparser = require('../index'),
 
 
 
-// var citrus = ecomparser('http://www.citrus.ua/shop/goods/tabletpc/262/248181', siteData);
+var citrus = ecomparser('http://www.citrus.ua/shop/goods/tabletpc/262/248181', siteData);
 
-// citrus.done(function(val) {
-//     console.log('Done!', val);
-// }, function(err) {
-//     console.log('Failed!', err);
-// });
+citrus.done(function(val) {
+    console.log('Done!', val);
+}, function(err) {
+    console.log('Failed!', err);
+});
 
 
 
@@ -47,10 +47,11 @@ var ecomparser = require('../index'),
 //     console.log('Failed!', err);
 // });
 
-var eldorado = ecomparser('http://www.eldorado.com.ua/offer_1366142/p1366142/', siteData);
 
-eldorado.done(function(val) {
-    console.log('Done!', val);
-}, function(err) {
-    console.log('Failed!', err);
-});
+// var eldorado = ecomparser('http://www.eldorado.com.ua/offer_1366142/p1366142/', siteData);
+
+// eldorado.done(function(val) {
+//     console.log('Done!', val);
+// }, function(err) {
+//     console.log('Failed!', err);
+// });

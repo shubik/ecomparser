@@ -2,10 +2,13 @@ var _               = require('lodash'),
     request         = require('request'),
     URLParser       = require('url'),
     deferred        = require('deferred'),
-    cheerio         = require('cheerio');
+    cheerio         = require('cheerio'),
+    microdataParser = require('microdata-node'),
+    ns              = require('./lib/ns');
 
 
-function parseFloat(str) {
+function parseNum(str) {
+    console.log('parseNum()', str);
     return str.match(/(\d+).? ?(\d+)/)[0].replace(' ','');
 }
 
@@ -42,8 +45,10 @@ module.exports = function(url, siteData) {
         retData.hostname = URLParser.parse(url).hostname;
 
         if (!error && response.statusCode == 200) {
-            var hostInfo = getHostInfo(siteData, retData.hostname),
-                $body    = cheerio.load(html);
+
+            var hostInfo  = getHostInfo(siteData, retData.hostname),
+                $body     = cheerio.load(html),
+                microdata = microdataParser.toJson(html);
 
             /* --- Set default values --- */
 
@@ -68,28 +73,37 @@ module.exports = function(url, siteData) {
 
             /* --- Get price ---*/
 
-            switch (hostInfo.price.attr) {
-                case 'text':
-                    retData.price = parseFloat($body(hostInfo.price.selector).text());
-                    break;
+            if (hostInfo.price.microdata) {
+                retData.price = parseNum(ns.get(microdata, hostInfo.price.microdata));
+            } else if (hostInfo.price.selector) {
 
-                default:
-                    retData.price = parseFloat($body(hostInfo.price.selector).attr(hostInfo.price.attr));
+                switch (hostInfo.price.attr) {
+                    case 'text':
+                        retData.price = parseNum($body(hostInfo.price.selector).text());
+                        break;
+
+                    default:
+                        retData.price = parseNum($body(hostInfo.price.selector).attr(hostInfo.price.attr));
+                }
             }
+
 
             /* --- Get currency ---*/
 
-            if (hostInfo.priceCurrency.selector) {
-                retData.priceCurrency = $body(hostInfo.url.selector).attr(hostInfo.url.attr);
-            } else {
-                retData.priceCurrency = hostInfo.priceCurrency.default;
-            }
 
-            // if (hostInfo.priceCurrency.microdata) {
-            //     retData.priceCurrency = ns.get(microdata, hostInfo.priceCurrency.microdata);
-            // } else {
-            //     retData.priceCurrency = hostInfo.priceCurrency.default;
-            // }
+            if (hostInfo.priceCurrency.microdata) {
+                retData.priceCurrency = ns.get(microdata, hostInfo.priceCurrency.microdata);
+            } else if (hostInfo.priceCurrency.selector) {
+
+                switch (hostInfo.priceCurrency.attr) {
+                    case 'text':
+                        retData.priceCurrency = $body(hostInfo.priceCurrency.selector).text();
+                        break;
+
+                    default:
+                        retData.priceCurrency = $body(hostInfo.priceCurrency.selector).attr(hostInfo.priceCurrency.attr);
+                }
+            }
 
 
             def.resolve(retData);

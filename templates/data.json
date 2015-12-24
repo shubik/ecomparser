@@ -1,13 +1,16 @@
 {
     "www.citrus.ua" : {
         "title" : {
-            "opengraph" : "title"
+            "selector"  : "meta[property=\"og:title\"]",
+            "attr" : "content"
         },
         "url" : {
-            "opengraph" : "url"
+            "selector"  : "meta[property=\"og:url\"]",
+            "attr" : "content"
         },
         "image" : {
-            "opengraph" : "image"
+            "selector"  : "meta[property=\"og:image\"]",
+            "attr" : "content"
         },
         "price" : {
             "microdata" : "items.0.properties.offers.0.properties.price.0"
