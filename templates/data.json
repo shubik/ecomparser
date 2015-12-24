@@ -37,6 +37,25 @@
         }
     },
 
+    "hard.rozetka.com.ua" : {
+        "title" : {
+            "opengraph" : "title"
+        },
+        "url" : {
+            "opengraph" : "url"
+        },
+        "image" : {
+            "opengraph" : "image"
+        },
+        "price" : {
+            "microdata" : "items.0.properties.offers.0.properties.price.0"
+        },
+        "priceCurrency" : {
+            "microdata" : "items.0.properties.offers.0.properties.priceCurrency.0",
+            "default"  : "UAH"
+        }
+    },
+
     "www.amazon.com" : {
         "title" : {
             "selector" : "#productTitle"

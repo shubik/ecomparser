@@ -11,6 +11,12 @@ var _               = require('lodash'),
     noop            = function() {};
 
 
+
+function parseDecimal(str) {
+    return str.match(/(\d+).? ?(\d+)/)[0].replace(' ','');
+}
+
+
 module.exports = function(url, siteData) {
     var def = deferred();
 
@@ -42,7 +48,9 @@ module.exports = function(url, siteData) {
             microdata = microdataParser.toJson(html);
             metatags = body.querySelectorAll('meta');
 
+
             // console.log('microdata:', JSON.stringify(microdata, null, 2));
+            // console.log('PRICE:', ns.get(microdata, 'items.0.properties.offers.0.properties.price.0'));
 
 
             /* --- Get title --- */
@@ -76,10 +84,10 @@ module.exports = function(url, siteData) {
             /* --- Get price ---*/
 
             if (hostInfo.price.microdata) {
-                retData.price = ns.get(microdata, hostInfo.price.microdata);
+                retData.price = parseDecimal(ns.get(microdata, hostInfo.price.microdata));
             } else if (hostInfo.price.selector) {
                 var el = body.querySelector(hostInfo.price.selector);
-                retData.price = el.childNodes[0].rawText.match(/\d+.?\d?\d?/)[0];
+                retData.price = parseDecimal(el.childNodes[0].rawText);
             }
 
             /* --- Get currency ---*/
