@@ -23,13 +23,16 @@
 
     "allo.ua" : {
         "title" : {
-            "opengraph" : "title"
+            "selector"  : "meta[property=\"og:title\"]",
+            "attr" : "content"
         },
         "url" : {
-            "opengraph" : "url"
+            "selector"  : "meta[property=\"og:url\"]",
+            "attr" : "content"
         },
         "image" : {
-            "opengraph" : "image"
+            "selector"  : "meta[property=\"og:image\"]",
+            "attr" : "content"
         },
         "price" : {
             "microdata" : "items.3.properties.offers.0.properties.price.0"
@@ -42,13 +45,16 @@
 
     "*.rozetka.com.ua" : {
         "title" : {
-            "opengraph" : "title"
+            "selector"  : "meta[property=\"og:title\"]",
+            "attr" : "content"
         },
         "url" : {
-            "opengraph" : "url"
+            "selector"  : "meta[property=\"og:url\"]",
+            "attr" : "content"
         },
         "image" : {
-            "opengraph" : "image"
+            "selector"  : "meta[property=\"og:image\"]",
+            "attr" : "content"
         },
         "price" : {
             "microdata" : "items.0.properties.offers.0.properties.price.0"
@@ -61,13 +67,16 @@
 
     "www.foxtrot.com.ua" : {
         "title" : {
-            "opengraph" : "title"
+            "selector"  : "meta[property=\"og:title\"]",
+            "attr" : "content"
         },
         "url" : {
-            "opengraph" : "url"
+            "selector"  : "meta[property=\"og:url\"]",
+            "attr" : "content"
         },
         "image" : {
-            "opengraph" : "image"
+            "selector"  : "meta[property=\"og:image\"]",
+            "attr" : "content"
         },
         "price" : {
             "selector" : ".curr_price"
@@ -91,8 +100,7 @@
             "attr" : "content"
         },
         "price" : {
-            "selector" : "span[property=\"v:pricerange\"]",
-            "attr"     : "text"
+            "selector" : "span[property=\"v:pricerange\"]"
         },
         "priceCurrency" : {
             "default"  : "UAH"
@@ -104,7 +112,7 @@
             "selector" : "#productTitle"
         },
         "url" : {
-            "link" : "rel=\"canonical\"",
+            "selector" : "link[rel=\"canonical\"]",
             "attr" : "href"
         },
         "image" : {
@@ -115,7 +123,6 @@
             "selector" : "#priceblock_ourprice"
         },
         "priceCurrency" : {
-            "selector" : "#productTitle",
             "default"  : "USD"
         }
     }

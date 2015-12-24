@@ -8,7 +8,6 @@ var _               = require('lodash'),
 
 
 function parseNum(str) {
-    console.log('parseNum()', str);
     return str.match(/(\d+).? ?(\d+)/)[0].replace(' ','');
 }
 
@@ -32,7 +31,7 @@ module.exports = function(url, siteData) {
         reqOpts = {
             url : url,
             headers : {
-                'User-Agent'      : 'curl/7.35.0', // Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36
+                'User-Agent'      : 'curl/7.35.0',
                 'Accept'          : '*',
                 'Accept-Encoding' : '',
                 'Cache-Control'   : 'max-age=0'
@@ -77,19 +76,16 @@ module.exports = function(url, siteData) {
                 retData.price = parseNum(ns.get(microdata, hostInfo.price.microdata));
             } else if (hostInfo.price.selector) {
 
-                switch (hostInfo.price.attr) {
-                    case 'text':
-                        retData.price = parseNum($body(hostInfo.price.selector).text());
-                        break;
-
-                    default:
-                        retData.price = parseNum($body(hostInfo.price.selector).attr(hostInfo.price.attr));
+                if (hostInfo.price.attr) {
+                    retData.price = parseNum($body(hostInfo.price.selector).attr(hostInfo.price.attr));
+                } else {
+                    retData.price = parseNum($body(hostInfo.price.selector).text());
                 }
+
             }
 
 
             /* --- Get currency ---*/
-
 
             if (hostInfo.priceCurrency.microdata) {
                 retData.priceCurrency = ns.get(microdata, hostInfo.priceCurrency.microdata);
@@ -103,13 +99,15 @@ module.exports = function(url, siteData) {
                     default:
                         retData.priceCurrency = $body(hostInfo.priceCurrency.selector).attr(hostInfo.priceCurrency.attr);
                 }
+            } else {
+                retData.priceCurrency = hostInfo.priceCurrency.default;
             }
 
 
             def.resolve(retData);
 
         } else {
-            console.log('Error?', error, response);
+            console.log('FAILED:', url, error);
             def.reject(error);
         }
     });
