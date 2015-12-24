@@ -80,6 +80,11 @@ module.exports = function(url, siteData) {
 
         if (!error && response.statusCode == 200) {
 
+            var hostInfo,
+                $page,
+                microdata;
+
+
             /* --- Detect character encoding and decode HTML if necessary --- */
 
             html = decodeHTML(html);
@@ -87,10 +92,12 @@ module.exports = function(url, siteData) {
             /* --- Set page's hostname --- */
 
             retData.hostname = URLParser.parse(url).hostname;
+            hostInfo  = getHostInfo(siteData, retData.hostname);
 
-            var hostInfo  = getHostInfo(siteData, retData.hostname),
-                $page     = cheerio.load(html),
-                microdata = microdataParser.toJson(html);
+            if (!hostInfo) return def.reject(new Error('Host info is not defined for ' + retData.hostname));
+
+            $page     = cheerio.load(html);
+            microdata = microdataParser.toJson(html);
 
 
             /* --- Set default values --- */
@@ -143,7 +150,7 @@ module.exports = function(url, siteData) {
                 try {
                     retData.price = parseNumber(ns.get(microdata, hostInfo.price.microdata));
                 } catch (err) {
-                    console.log('get price for failed:', err);
+                    console.warn('Parsing price failed for', hostInfo.price.microdata);
                     console.log('microdata:', JSON.stringify(ns.get(microdata, 'items'), null, 2));
                 }
             } else if (hostInfo.price.selector) {

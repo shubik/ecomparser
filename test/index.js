@@ -31,13 +31,13 @@ var ecomparser = require('../index'),
 // });
 
 
-var rozetka = ecomparser('http://bt.rozetka.com.ua/granchio-ecopan-88064-22/p151818/', siteData);
+// var rozetka = ecomparser('http://bt.rozetka.com.ua/granchio-ecopan-88064-22/p151818/', siteData);
 
-rozetka.done(function(val) {
-    console.log('Done!', val);
-}, function(err) {
-    console.log('Failed!', err);
-});
+// rozetka.done(function(val) {
+//     console.log('Done!', val);
+// }, function(err) {
+//     console.log('Failed!', err);
+// });
 
 
 // var foxtrot = ecomparser('http://www.foxtrot.com.ua/ru/shop/holodilniki_delfa_dbf-150.html', siteData);
@@ -110,3 +110,12 @@ rozetka.done(function(val) {
 // }, function(err) {
 //     console.log('Failed!');
 // });
+
+
+var promua = ecomparser('http://ilounge.com.ua/products/avtozaryadka-rock-dual-motor-aluminum-grey-kupit', siteData);
+
+promua.done(function(val) {
+    console.log(val);
+}, function(err) {
+    console.log(err.toString());
+});
