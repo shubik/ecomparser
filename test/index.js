@@ -148,9 +148,27 @@ var ecomparser = require('../index'),
 // });
 
 
-var citycomua = ecomparser('http://city.com.ua/goods/tablets/asus-memo-pad-7-me70c-8gb-black.html', siteData);
+// var citycomua = ecomparser('http://city.com.ua/goods/tablets/asus-memo-pad-7-me70c-8gb-black.html', siteData);
 
-citycomua.done(function(data) {
+// citycomua.done(function(data) {
+//     console.log(data);
+// }, function(err) {
+//     console.log(err.toString());
+// });
+
+
+// var styluscomua = ecomparser('http://stylus.com.ua/ru/products/details/221425/index.html', siteData);
+
+// styluscomua.done(function(data) {
+//     console.log(data);
+// }, function(err) {
+//     console.log(err.toString());
+// });
+
+
+var fiveok = ecomparser('http://www.5ok.com.ua/holodilniki/delfa-dbf-150.html', siteData);
+
+fiveok.done(function(data) {
     console.log(data);
 }, function(err) {
     console.log(err.toString());

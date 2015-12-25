@@ -344,5 +344,44 @@
         "priceCurrency" : {
             "default"  : "UAH"
         }
+    },
+
+    "stylus.com.ua" : {
+        "title" : {
+            "selector"  : "#product-block [itemprop=\"name\"]"
+        },
+        "url" : {
+            "selector"  : "meta[property=\"og:url\"]",
+            "attr" : "content"
+        },
+        "image" : {
+            "selector"  : "meta[property=\"og:image\"]",
+            "attr" : "content"
+        },
+        "price" : {
+            "selector" : "[itemprop=\"price\"] .price"
+        },
+        "priceCurrency" : {
+            "selector" : "[itemprop=\"priceCurrency\"]",
+            "attr" : "content",
+            "default"  : "UAH"
+        }
+    },
+
+    "www.5ok.com.ua" : {
+        "title" : {
+            "selector"  : ".details-block-left h1:first-child"
+        },
+        "url" : null,
+        "image" : {
+            "selector"  : "#imgProduct",
+            "attr" : "src"
+        },
+        "price" : {
+            "selector" : ".detail .price"
+        },
+        "priceCurrency" : {
+            "default"  : "UAH"
+        }
     }
 }
