@@ -5,7 +5,19 @@ var _               = require('lodash'),
     cheerio         = require('cheerio'),
     microdataParser = require('microdata-node'),
     windows1251     = require('windows-1251'),
-    ns              = require('./lib/ns');
+    ns              = require('./lib/ns'),
+    defaultHeaders,
+    Ecomparser;
+
+
+defaultHeaders = {
+    'User-Agent'      : 'curl/7.35.0',
+    'Accept'          : '*/*',
+    'Accept-Encoding' : '',
+    'Cache-Control'   : 'max-age=0',
+    'Referer'         : 'http://farennikov.com',
+    'Connection'      : 'close'
+}
 
 
 function parseNumber(str) {
@@ -57,18 +69,11 @@ function cleanTxt(str) {
 }
 
 
-module.exports = function(url, siteData) {
+module.exports = Ecomparser = function(url, siteData) {
     var def = deferred(),
         reqOpts = {
             url : url,
-            headers : {
-                'User-Agent'      : 'curl/7.35.0',
-                'Accept'          : '*/*',
-                'Accept-Encoding' : '',
-                'Cache-Control'   : 'max-age=0',
-                'Referer'         : 'http://farennikov.com',
-                'Connection'      : 'close'
-            }
+            headers : defaultHeaders
         };
 
 
@@ -77,8 +82,7 @@ module.exports = function(url, siteData) {
     request(reqOpts, function (error, response, html) {
         var retData = {};
 
-
-        if (!error && response.statusCode == 200) {
+        if (!error && response.statusCode === 200) {
 
             var parsedURL = URLParser.parse(url),
                 hostInfo,
@@ -199,6 +203,64 @@ module.exports = function(url, siteData) {
 
 
             /* --- Resolve deferred --- */
+
+            def.resolve(retData);
+
+        } else {
+            console.log('FAILED:', url, error, html);
+            def.reject(error);
+        }
+    });
+
+    return def.promise;
+}
+
+
+Ecomparser.analize = function(url) {
+    var def = deferred(),
+        reqOpts = {
+            url : url,
+            headers : defaultHeaders
+        };
+
+
+    /* --- Try loading and parsing page --- */
+
+    request(reqOpts, function (error, response, html) {
+        var retData = {},
+            microdata;
+
+        if (!error && response.statusCode === 200) {
+
+            /* --- Set defaults --- */
+
+            retData.opengaph = false;
+            retData.schema = false;
+            retData.charset = getCharset(html);
+
+            /* --- Check opengaph markup --- */
+
+            if (html.match(/property=["|']*og:name/gi)) {
+                retData.opengaph = true;
+                retData.name = true;
+            }
+
+            if (html.match(/property=["|']*og:url/gi)) {
+                retData.opengaph = true;
+                retData.url = true;
+            }
+
+            if (html.match(/property=["|']*og:image/gi)) {
+                retData.opengaph = true;
+                retData.image = true;
+            }
+
+
+            /* --- Check microformat (schema) --- */
+
+            microdata = microdataParser.toJson(html);
+
+            if (microdata) retData.schema = true;
 
             def.resolve(retData);
 
