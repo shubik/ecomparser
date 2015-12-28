@@ -1,7 +1,7 @@
 {
   "name": "ecomparser",
   "description": "Parser for e-commerce web sites",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "os": "linux",
   "scripts": {
     "test": "node ./test/index.js"
