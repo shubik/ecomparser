@@ -1,7 +1,7 @@
 {
   "name": "ecomparser",
   "description": "Parser for e-commerce web sites",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "os": "linux",
   "scripts": {
     "test": "node ./test/index.js"
@@ -25,6 +25,7 @@
   },
   "keywords": [
     "e-commerce",
+    "ecommerce",
     "parser",
     "schema",
     "opengraph",

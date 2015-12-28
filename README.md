@@ -9,9 +9,9 @@ Ecomparser is a Node.js library for parsing e-commerce web pages in order to ret
 *   Price currency
 
 ## Installation
-npm install ecomparser
-```js
 
+```js
+npm install ecomparser
 ```
 
 ## Sample usage
