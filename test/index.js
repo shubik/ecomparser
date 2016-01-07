@@ -173,11 +173,3 @@ fiveok.done(function(data) {
 }, function(err) {
     console.log(err.toString());
 });
-
-var fiveokSchema = ecomparser.analize('http://www.5ok.com.ua/holodilniki/delfa-dbf-150.html');
-
-fiveokSchema.done(function(data) {
-    console.log(data);
-}, function(err) {
-    console.log(err.toString());
-});

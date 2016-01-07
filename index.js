@@ -21,7 +21,9 @@ defaultHeaders = {
 
 
 function parseNumber(str) {
-    return str.match(/(\d+).? ?(\d+)/)[0].replace(' ','');
+    var matches = str.match(/(\d+).? ?(\d+)/);
+    if (matches !== null) return matches[0].replace(' ','');
+    else return undefined;
 }
 
 
@@ -63,9 +65,17 @@ function decodeHTML(html) {
 
 
 function cleanTxt(str) {
-    str = str.replace(/ +(?= )/g, '');
-    str = str.replace(/\r?\n|\r/g, '');
-    return str.trim();
+    return (str || '').replace(/\r?\n|\r|\t| +(?= )/g, '').trim();
+}
+
+
+function normalizeHTML(html) {
+    return cleanTxt(html).replace(/>[ |\t\n\b]+/gi, ">").replace(/[ |\t\n\b]+</gi, "<").replace("&nbsp;", " ");
+}
+
+
+function numberWithRegexSeparators (number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "[ |,]?");
 }
 
 
@@ -93,6 +103,7 @@ module.exports = Ecomparser = function(url, siteData) {
 
             /* --- Detect character encoding and decode HTML if necessary --- */
 
+            html = cleanTxt(html);
             html = decodeHTML(html);
 
             /* --- Set page's hostname --- */
@@ -238,6 +249,9 @@ Ecomparser.analize = function(url) {
             retData.schema = false;
             retData.charset = getCharset(html);
 
+            html = normalizeHTML(html);
+            html = decodeHTML(html);
+
             /* --- Check opengaph markup --- */
 
             if (html.match(/property=["|']*og:name/gi)) {
@@ -262,6 +276,11 @@ Ecomparser.analize = function(url) {
 
             if (microdata) retData.schema = true;
 
+            /* --- Attach HTML and microdata --- */
+
+            retData.html = html;
+            retData.microdata = microdata;
+
             def.resolve(retData);
 
         } else {
@@ -271,4 +290,50 @@ Ecomparser.analize = function(url) {
     });
 
     return def.promise;
+}
+
+
+Ecomparser.findPrice = function(data, price) {
+
+    price = price.toString();
+
+    var priceRegexpPart = numberWithRegexSeparators(price),
+        retval = {};
+
+
+    /*
+
+    1) is in microdata?
+    2) itemprop=\"price\" (value in content or text)?  "42 554 грн"  "43&nbsp;383"  "43,383"
+    3) data-price="NNN"
+    4) had "id" prop?
+    5) property=\"v:pricerange\"?
+    6) has class with "price" in it?
+    7) parent has class with "price" in it?
+    8) has a unique looking class?
+    9) JS 'price': '42554'
+
+    */
+
+
+    /* --- 1) If page has microdata ---*/
+
+    if (data.schema) {
+        var microdata = ns.stringify(data.microdata),
+            namespace = _.reduce(microdata, function(memo, val, key) {
+                if (val.toString() === price) memo = key;
+                return memo;
+            }, null);
+
+        retval.type = 'microdata';
+        retval.key = namespace;
+
+        return retval;
+    }
+
+}
+
+
+Ecomparser.findTitle = function(html, title) {
+
 }
