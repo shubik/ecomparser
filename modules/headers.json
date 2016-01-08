@@ -1,0 +1,8 @@
+{
+    "User-Agent"      : "curl/7.35.0",
+    "Accept"          : "*/*",
+    "Accept-Encoding" : "",
+    "Cache-Control"   : "max-age=0",
+    "Referer"         : "http://farennikov.com",
+    "Connection"      : "close"
+}
