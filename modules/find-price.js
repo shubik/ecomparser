@@ -20,7 +20,6 @@ module.exports = function(data, price) {
     5) property=\"v:pricerange\"?
     6) has class with "price" in it?
     7) parent has class with "price" in it?
-    8) has a unique looking class?
     9) JS 'price': '42554'
 
     */
@@ -40,6 +39,27 @@ module.exports = function(data, price) {
 
         return retval;
     }
+
+    /* --- 2) does page contain itemprop=\"price\" --- */
+
+
+    /* --- 3) does page contain data-price="NNN" --- */
+
+
+    /* --- 4) does page have property=\"v:pricerange\" --- */
+
+
+    /* --- 5) does node have an ID prop --- */
+
+
+    /* --- 6) does node have class with 'price' word in it --- */
+
+
+    /* --- 7) does node's parent has class with "price" in it --- */
+
+
+    /* --- 8) does any <script> tag have 'price':'NNN' or 'price'='NNN' markup --- */
+
 
     console.log('findPrice() done...');
 }
