@@ -54,14 +54,20 @@ function matchItempropPrice (lastNode, price, payload, DOMPath) {
     var success = false;
 
     if (lastNode.attribs.content && pricesAreSame(lastNode.attribs.content, price)) {
-        payload.type = 'itemprop';
-        payload.get = 'nodeContentAttr';
-        payload.selector = getNodeSelector(DOMPath, '[itemprop="price"]');
+        payload.push({
+            type     : 'itemprop',
+            target   : 'nodeContentAttr',
+            selector : getNodeSelector(DOMPath, '[itemprop="price"]')
+        });
+
         success = true;
     } else if (pricesAreSame(Utils.parseNumber(lastNode.text), price)) {
-        payload.type = 'itemprop';
-        payload.get = 'nodeText';
-        payload.selector = getNodeSelector(DOMPath, '[itemprop="price"]');
+        payload.push({
+            type     : 'itemprop',
+            target   : 'nodeText',
+            selector : getNodeSelector(DOMPath, '[itemprop="price"]')
+        });
+
         success = true;
     }
 
@@ -72,7 +78,7 @@ function matchDataPriceAttr (lastNode, price, payload, DOMPath) {
     var success = false;
 
     if (lastNode.attribs['data-price'] && pricesAreSame(lastNode.attribs['data-price'], price)) {
-        payload.type = 'data-price';
+        payload.push({ type : 'data-price' });
         success = true;
     }
 
@@ -83,7 +89,7 @@ function matchVPricerangeAttr (lastNode, price, payload, DOMPath) {
     var success = false;
 
     if (pricesAreSame(Utils.parseNumber(lastNode.text), price)) {
-        payload.type = 'v:pricerange';
+        payload.push({ type : 'v:pricerange' });
         success = true;
     }
 
@@ -100,7 +106,7 @@ module.exports = function(data, price) {
     price = price.toString();
 
     var priceRegexpPart = Utils.numberWithRegexSeparators(price),
-        retval = {};
+        retval = [];
 
 
     /*
@@ -126,10 +132,11 @@ module.exports = function(data, price) {
                 return memo;
             }, null);
 
-        retval.type = 'microdata';
-        retval.key = namespace;
 
-        // return retval;
+        retval.push({
+            type : 'microdata',
+            key  : namespace
+        });
     }
 
 
