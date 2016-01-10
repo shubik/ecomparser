@@ -49,7 +49,18 @@ function hasIdAttr (attribs) {
     return !!attribs['id'];
 }
 
-onopentagFilters = [hasItempropPrice, hasDataPriceAttr, hasVPricerangeAttr, hasIdAttr];
+function hasClassAttr (attribs) {
+    console.log('hasClassAttr', attribs['class']);
+    return !!attribs['class'];
+}
+
+onopentagFilters = [
+    hasItempropPrice,
+    hasDataPriceAttr,
+    hasVPricerangeAttr,
+    hasIdAttr,
+    hasClassAttr
+];
 
 
 /* --- onclosetag filters --- */
@@ -115,8 +126,34 @@ function matchNodeWithIdHasPrice (lastNode, price, payload, DOMPath) {
     return success;
 }
 
+function matchNodeWithClass (lastNode, price, payload, DOMPath) {
+    var success = false;
 
-onclosetagFilters = [matchItempropPrice, matchDataPriceAttr, matchVPricerangeAttr, matchNodeWithIdHasPrice];
+    if (lastNode.attribs['class']) {
+        var matches = lastNode.attribs['class'].match(/\b(?=\w*price)\w+\b/i);
+
+        if (matches && pricesAreSame(Utils.parseNumber(lastNode.text), price)) {
+            payload.push({
+                type     : 'class-has-price',
+                target   : 'nodeText',
+                selector : '.' + matches[0]
+            });
+
+            success = true;
+        }
+    }
+
+    return success;
+}
+
+
+onclosetagFilters = [
+    matchItempropPrice,
+    matchDataPriceAttr,
+    matchVPricerangeAttr,
+    matchNodeWithIdHasPrice,
+    matchNodeWithClass
+];
 
 
 

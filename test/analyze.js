@@ -9,11 +9,11 @@ var ecomparser = require('../index');
 // http://myphone.kh.ua/monoblok-apple-imac-215-with-retina-4k-display-mk452-2015/
 // http://vivostore.ua/product/apple-new-imac-21-5-retina-mk452-2015
 // http://foxmart.ua/kompyoutery/apple-imac-a1418-mk452uaa.html
+// http://xclusive.com.ua/catalog/macbook/mk452.html
 
-var test = ecomparser.analyze('http://xclusive.com.ua/catalog/macbook/mk452.html');
+var test = ecomparser.analyze('http://pcshop.ua/Monoblok_Apple_iMac_MK452.aspx');
 
 test.done(function(data) {
-    // console.log('charset:', data.charset, 'og:', data.opengraph, 'schema:', data.schema, 'URL:', data.url, 'img:', data.image);
 
     var priceData = ecomparser.findPrice(data, 42549);
     console.log('priceData:', priceData);
