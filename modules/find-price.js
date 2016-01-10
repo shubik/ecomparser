@@ -2,8 +2,7 @@ var _          = require('lodash'),
     Utils      = require('./utils'),
     ns         = require('../lib/ns'),
     htmlparser = require('htmlparser2'),
-    onopentagFilters,
-    onclosetagFilters;
+    filters;
 
 
 function getNodeSelector (nodes, suffix) {
@@ -31,103 +30,52 @@ function pricesAreSame (p1, p2) {
 }
 
 
-/* --- onopentag filters --- */
-
-function hasItempropPrice (attribs) {
-    return attribs.itemprop && attribs.itemprop === 'price';
-}
-
-function hasDataPriceAttr (attribs) {
-    return !!attribs['data-price'];
-}
-
-function hasVPricerangeAttr (attribs) {
-    return attribs['property'] && attribs['property'] === 'v:pricerange';
-}
-
-function hasIdAttr (attribs) {
-    return !!attribs['id'];
-}
-
-function hasClassAttr (attribs) {
-    return !!attribs['class'];
-}
-
-onopentagFilters = [
-    hasItempropPrice,
-    hasDataPriceAttr,
-    hasVPricerangeAttr,
-    hasIdAttr,
-    hasClassAttr
-];
-
 
 /* --- onclosetag filters --- */
 
-function matchItempropPrice (lastNode, price, payload, DOMPath) {
-    var success = false;
-
-    if (lastNode.attribs.content && pricesAreSame(lastNode.attribs.content, price)) {
+function matchItemprop (lastNode, price, payload, DOMPath) {
+    if (lastNode.attribs.itemprop && lastNode.attribs.content && pricesAreSame(lastNode.attribs.content, price)) {
         payload.push({
             type     : 'itemprop',
             target   : 'nodeContentAttr',
             selector : getNodeSelector(DOMPath, '[itemprop="price"]')
         });
-
-        success = true;
-    } else if (pricesAreSame(Utils.parseNumber(lastNode.text), price)) {
+    } else if (lastNode.attribs.itemprop && pricesAreSame(Utils.parseNumber(lastNode.text), price)) {
         payload.push({
             type     : 'itemprop',
             target   : 'nodeText',
             selector : getNodeSelector(DOMPath, '[itemprop="price"]')
         });
-
-        success = true;
     }
-
-    return success;
 }
 
 function matchDataPriceAttr (lastNode, price, payload, DOMPath) {
-    var success = false;
-
     if (lastNode.attribs['data-price'] && pricesAreSame(lastNode.attribs['data-price'], price)) {
-        payload.push({ type : 'data-price' });
-        success = true;
+        payload.push({
+            type     : 'data-price',
+            target   : 'nodeText'
+        });
     }
-
-    return success;
 }
 
 function matchVPricerangeAttr (lastNode, price, payload, DOMPath) {
-    var success = false;
-
-    if (pricesAreSame(Utils.parseNumber(lastNode.text), price)) {
+    if (lastNode.attribs['property'] && lastNode.attribs['property'] === 'v:pricerange' && pricesAreSame(Utils.parseNumber(lastNode.text), price)) {
         payload.push({ type : 'v:pricerange' });
         success = true;
     }
-
-    return success;
 }
 
 function matchNodeWithIdHasPrice (lastNode, price, payload, DOMPath) {
-    var success = false;
-
     if (lastNode.attribs['id'] && pricesAreSame(Utils.parseNumber(lastNode.text), price)) {
         payload.push({
             type     : 'has-id',
             target   : 'nodeText',
             selector : '#' + lastNode.attribs['id']
         });
-        success = true;
     }
-
-    return success;
 }
 
 function matchNodeWithClass (lastNode, price, payload, DOMPath) {
-    var success = false;
-
     if (lastNode.attribs['class']) {
         var matches = lastNode.attribs['class'].match(/\b(?=\w*price)\w+\b/i);
 
@@ -137,21 +85,29 @@ function matchNodeWithClass (lastNode, price, payload, DOMPath) {
                 target   : 'nodeText',
                 selector : '.' + matches[0]
             });
-
-            success = true;
         }
     }
-
-    return success;
 }
 
 
-onclosetagFilters = [
-    matchItempropPrice,
+function matchAllNodes (lastNode, price, payload, DOMPath) {
+    if (pricesAreSame(Utils.parseNumber(lastNode.text), price)) {
+        payload.push({
+            type     : 'selector',
+            target   : 'nodeText',
+            selector : getNodeSelector(DOMPath)
+        });
+    }
+}
+
+
+filters = [
+    matchItemprop,
     matchDataPriceAttr,
     matchVPricerangeAttr,
     matchNodeWithIdHasPrice,
-    matchNodeWithClass
+    matchNodeWithClass,
+    matchAllNodes
 ];
 
 
@@ -205,20 +161,13 @@ module.exports = function(data, price) {
             onopentag: function(tagname, attribs){
                 var node = { tagname : tagname, attribs : attribs };
                 DOMPath.push(node);
-
-                // if (!targetFound) {
-                //     // targetFound = _.reduce(onopentagFilters, function(memo, filter) {
-                //     //     memo = memo || filter(attribs);
-                //     //     return memo;
-                //     // }, false);
-                // }
             },
 
             ontext: function(text){
                 if (targetClosed) return;
                 DOMPath[DOMPath.length - 1].text = text;
 
-                _.each(onclosetagFilters, function(filter) {
+                _.each(filters, function(filter) {
                     filter(DOMPath[DOMPath.length - 1], price, retval, DOMPath);
                 });
             },
@@ -227,28 +176,8 @@ module.exports = function(data, price) {
                 var lastNode = _.last(DOMPath);
 
                 if (lastNode.tagname === tagname) {
-
-                    // _.each(onclosetagFilters, function(filter) {
-                    //     filter(lastNode, price, retval, DOMPath);
-                    // });
-
                     DOMPath.pop();
                 }
-
-
-                // if (targetFound && !targetClosed) {
-
-                //     var success = _.reduce(onclosetagFilters, function(memo, filter) {
-                //         memo = memo || filter(lastNode, price, retval, DOMPath);
-                //     }, false);
-
-                //     if (success) {
-                //         targetClosed = true;
-                //     } else {
-                //         targetFound = false;
-                //     }
-                // }
-
             }
         }, { decodeEntities: true });
 
@@ -257,29 +186,5 @@ module.exports = function(data, price) {
     parser.end();
 
 
-    /* --- 8) does any <script> tag have 'price':'NNN' or 'price'='NNN' markup --- */
-
-
-    console.log('findPrice() done...');
-
     return retval;
 }
-
-
-// http://a-techno.com.ua/72767.html -- 1, 2
-// http://www.notus.com.ua/Apple-iMac-215-4K-display-MK452-NEW-2015 -- 2, 5
-// http://portativ.ua/product_98429.html -- 2
-// http://xclusive.com.ua/catalog/macbook/mk452.html -- 3
-// http://maclove.com.ua/catalog/261355/245048/70298 -- 7 class="uah"
-// http://www.sokol.ua/monoblok-apple-imac-a1418-mk452ua-a-065b9/p702209/ -- 2
-// http://foxmart.ua/kompyoutery/apple-imac-a1418-mk452uaa.html -- 2 (text, not content), 4
-// http://pcshop.ua/Monoblok_Apple_iMac_MK452.aspx -- 6
-// http://tid.ua/mikrovolnovaya-pech-gorenje-mo-17-dw-(mo17dw) -- 2 (text)
-// http://myphone.kh.ua/monoblok-apple-imac-215-with-retina-4k-display-mk452-2015/ -- 8, 6
-// http://chooser.com.ua/monoblok-apple-imac-215-with-retina-4k-display-mk452-2015 -- 9
-// http://vivostore.ua/product/apple-new-imac-21-5-retina-mk452-2015 -- 8, 6
-// https://store.iland.ua/apple-computers/personal-computers/imac/imac-21-5-retina-4-k-core-i5-3-1ghz-quad-core-8gb-1tb-intel-iris-pro-6200-mk452.html -- 6
-// http://solvo.com.ua/products/apple-imac-215-with-retina-4k-display-mk452-2015 -- 9
-// http://www.mrfix.com.ua/product/apple-imac-215-with-retina-4k-display-mk452/ -- 6
-// http://mcstore.com.ua/catalog/imac_21_5/apple_imac_21_5_new_mk452/ -- 6
-// http://www.ozon.ru/context/detail/id/18037252/ -- 6
