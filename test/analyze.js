@@ -8,12 +8,12 @@ var ecomparser = require('../index');
 // http://a-techno.com.ua/72767.html
 
 // http://myphone.kh.ua/monoblok-apple-imac-215-with-retina-4k-display-mk452-2015/
-var test = ecomparser.analyze('http://myphone.kh.ua/monoblok-apple-imac-215-with-retina-4k-display-mk452-2015/');
+var test = ecomparser.analyze('http://vivostore.ua/product/apple-new-imac-21-5-retina-mk452-2015');
 
 test.done(function(data) {
     // console.log('charset:', data.charset, 'og:', data.opengraph, 'schema:', data.schema, 'URL:', data.url, 'img:', data.image);
 
-    var priceData = ecomparser.findPrice(data, 43899);
+    var priceData = ecomparser.findPrice(data, 42790);
     console.log('priceData:', priceData);
 
 }, function(err) {

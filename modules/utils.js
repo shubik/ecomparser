@@ -25,7 +25,7 @@ module.exports = Utils = {
 
     getCharset: function (html) {
         var matches = html.match(/charset=["]*([^>"\s]+)/i);
-        return matches.length ? matches[1].toLowerCase() : undefined;
+        return matches && matches.length ? matches[1].toLowerCase() : undefined;
     },
 
 
