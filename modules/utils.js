@@ -4,6 +4,7 @@ var _           = require('lodash'),
 
 module.exports = Utils = {
     parseNumber: function (str) {
+        if (!str) return str;
         var matches = str.match(/(\d+).? ?(\d+)/);
         if (matches !== null) return matches[0].replace(' ','');
         else return undefined;

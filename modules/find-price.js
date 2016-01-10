@@ -45,7 +45,11 @@ function hasVPricerangeAttr (attribs) {
     return attribs['property'] && attribs['property'] === 'v:pricerange';
 }
 
-onopentagFilters = [hasItempropPrice, hasDataPriceAttr, hasVPricerangeAttr];
+function hasIdAttr (attribs) {
+    return !!attribs['id'];
+}
+
+onopentagFilters = [hasItempropPrice, hasDataPriceAttr, hasVPricerangeAttr, hasIdAttr];
 
 
 /* --- onclosetag filters --- */
@@ -96,7 +100,23 @@ function matchVPricerangeAttr (lastNode, price, payload, DOMPath) {
     return success;
 }
 
-onclosetagFilters = [matchItempropPrice, matchDataPriceAttr, matchVPricerangeAttr];
+function matchNodeWithIdHasPrice (lastNode, price, payload, DOMPath) {
+    var success = false;
+
+    if (lastNode.attribs['id'] && pricesAreSame(Utils.parseNumber(lastNode.text), price)) {
+        payload.push({
+            type     : 'has-id',
+            target   : 'nodeText',
+            selector : '#' + lastNode.attribs['id']
+        });
+        success = true;
+    }
+
+    return success;
+}
+
+
+onclosetagFilters = [matchItempropPrice, matchDataPriceAttr, matchVPricerangeAttr, matchNodeWithIdHasPrice];
 
 
 
