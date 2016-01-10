@@ -11,11 +11,11 @@ var ecomparser = require('../index');
 // http://foxmart.ua/kompyoutery/apple-imac-a1418-mk452uaa.html
 // http://xclusive.com.ua/catalog/macbook/mk452.html
 
-var test = ecomparser.analyze('http://pcshop.ua/Monoblok_Apple_iMac_MK452.aspx');
+var test = ecomparser.analyze('http://pcshop.ua/Kompyuter_APRIORI_Home_IG182040N730.aspx');
 
 test.done(function(data) {
 
-    var priceData = ecomparser.findPrice(data, 42549);
+    var priceData = ecomparser.findPrice(data, 6480);
     console.log('priceData:', priceData);
 
 }, function(err) {

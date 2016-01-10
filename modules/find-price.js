@@ -50,7 +50,6 @@ function hasIdAttr (attribs) {
 }
 
 function hasClassAttr (attribs) {
-    console.log('hasClassAttr', attribs['class']);
     return !!attribs['class'];
 }
 
@@ -175,7 +174,6 @@ module.exports = function(data, price) {
     5) has "id" prop?
     6) has class with "price" in it?
     7) parent has class with "price" in it?
-    9) JS 'price': '42554'
 
     */
 
@@ -190,7 +188,7 @@ module.exports = function(data, price) {
             }, null);
 
 
-        retval.push({
+        namespace !== null && retval.push({
             type : 'microdata',
             key  : namespace
         });
@@ -205,58 +203,58 @@ module.exports = function(data, price) {
 
         parser = new htmlparser.Parser({
             onopentag: function(tagname, attribs){
-                if (!targetFound) {
+                var node = { tagname : tagname, attribs : attribs };
+                DOMPath.push(node);
 
-                    var node = { tagname : tagname, attribs : attribs };
-                    DOMPath.push(node);
-
-                    targetFound = _.reduce(onopentagFilters, function(memo, filter) {
-                        memo = memo || filter(attribs);
-                        return memo;
-                    }, false);
-                }
+                // if (!targetFound) {
+                //     // targetFound = _.reduce(onopentagFilters, function(memo, filter) {
+                //     //     memo = memo || filter(attribs);
+                //     //     return memo;
+                //     // }, false);
+                // }
             },
 
             ontext: function(text){
                 if (targetClosed) return;
                 DOMPath[DOMPath.length - 1].text = text;
+
+                _.each(onclosetagFilters, function(filter) {
+                    filter(DOMPath[DOMPath.length - 1], price, retval, DOMPath);
+                });
             },
 
             onclosetag: function(tagname){
                 var lastNode = _.last(DOMPath);
 
-                if (targetFound && !targetClosed) {
-
-                    var success = _.reduce(onclosetagFilters, function(memo, filter) {
-                        memo = memo || filter(lastNode, price, retval, DOMPath);
-                    }, false);
-
-                    if (success) {
-                        targetClosed = true;
-                    } else {
-                        targetFound = false;
-                    }
-                }
-
                 if (lastNode.tagname === tagname) {
+
+                    // _.each(onclosetagFilters, function(filter) {
+                    //     filter(lastNode, price, retval, DOMPath);
+                    // });
+
                     DOMPath.pop();
                 }
+
+
+                // if (targetFound && !targetClosed) {
+
+                //     var success = _.reduce(onclosetagFilters, function(memo, filter) {
+                //         memo = memo || filter(lastNode, price, retval, DOMPath);
+                //     }, false);
+
+                //     if (success) {
+                //         targetClosed = true;
+                //     } else {
+                //         targetFound = false;
+                //     }
+                // }
+
             }
         }, { decodeEntities: true });
 
 
     parser.write(data.html);
     parser.end();
-
-
-
-    /* --- 5) does node have an ID prop --- */
-
-
-    /* --- 6) does node have class with 'price' word in it --- */
-
-
-    /* --- 7) does node's parent has class with "price" in it --- */
 
 
     /* --- 8) does any <script> tag have 'price':'NNN' or 'price'='NNN' markup --- */
