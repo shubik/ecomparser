@@ -133,10 +133,10 @@ module.exports = function(data, price) {
     }
 
 
-    /* --- 2) does page contain itemprop="price" --- */
+    /* --- Parse DOM and make necessary checks --- */
 
-    var DOMPath = [],
-        targetFound = false,
+    var DOMPath      = [],
+        targetFound  = false,
         targetClosed = false,
 
         parser = new htmlparser.Parser({
@@ -146,9 +146,10 @@ module.exports = function(data, price) {
                     var node = { tagname : tagname, attribs : attribs };
                     DOMPath.push(node);
 
-                    if (attribs.itemprop && attribs.itemprop === 'price') {
-                        targetFound = true;
-                    }
+                    targetFound = _.reduce(onopentagFilters, function(memo, filter) {
+                        memo = memo || filter(attribs);
+                        return memo;
+                    }, false);
                 }
             },
 
@@ -162,20 +163,12 @@ module.exports = function(data, price) {
 
                 if (targetFound && !targetClosed) {
 
-                    /* --- Check if content or text equals price --- */
+                    var success = _.reduce(onclosetagFilters, function(memo, filter) {
+                        memo = memo || filter(lastNode, price, retval, DOMPath);
+                    }, false);
 
-                    if (lastNode.attribs.content && pricesAreSame(lastNode.attribs.content, price)) {
-                        retval.type = 'itemprop';
-                        retval.get = 'nodeContentAttr';
-                        retval.selector = getNodeSelector(DOMPath, '[itemprop="price"]');
+                    if (success) {
                         targetClosed = true;
-                        return;
-                    } else if (pricesAreSame(Utils.parseNumber(lastNode.text), price)) {
-                        retval.type = 'itemprop';
-                        retval.get = 'nodeText';
-                        retval.selector = getNodeSelector(DOMPath, '[itemprop="price"]');
-                        targetClosed = true;
-                        return;
                     } else {
                         targetFound = false;
                     }
@@ -191,110 +184,6 @@ module.exports = function(data, price) {
     parser.write(data.html);
     parser.end();
 
-
-
-    /* --- 3) does page contain data-price="NNN" --- */
-
-
-    var DOMPath = [],
-        targetFound = false,
-        targetClosed = false,
-
-        parser = new htmlparser.Parser({
-            onopentag: function(tagname, attribs){
-                if (!targetFound) {
-
-                    var node = { tagname : tagname, attribs : attribs };
-                    DOMPath.push(node);
-
-                    if (attribs['data-price']) {
-                        targetFound = true;
-                    }
-                }
-            },
-
-            ontext: function(text){
-                if (targetClosed) return;
-                DOMPath[DOMPath.length - 1].text = text;
-            },
-
-            onclosetag: function(tagname){
-                var lastNode = _.last(DOMPath);
-
-                if (targetFound && !targetClosed) {
-
-                    /* --- Check if data-price attribute value equals price --- */
-
-                    if (lastNode.attribs['data-price'] && pricesAreSame(lastNode.attribs['data-price'], price)) {
-                        retval.type = 'data-price';
-                        targetClosed = true;
-                        return;
-                    } else {
-                        targetFound = false;
-                    }
-                }
-
-                if (lastNode.tagname === tagname) {
-                    DOMPath.pop();
-                }
-            }
-        }, { decodeEntities: true });
-
-
-    parser.write(data.html);
-    parser.end();
-
-
-    /* --- 4) does page have property="v:pricerange" --- */
-
-
-    var DOMPath = [],
-        targetFound = false,
-        targetClosed = false,
-
-        parser = new htmlparser.Parser({
-            onopentag: function(tagname, attribs){
-                if (!targetFound) {
-
-                    var node = { tagname : tagname, attribs : attribs };
-                    DOMPath.push(node);
-
-                    if (attribs['property'] && attribs['property'] === 'v:pricerange') {
-                        targetFound = true;
-                    }
-                }
-            },
-
-            ontext: function(text){
-                if (targetClosed) return;
-                DOMPath[DOMPath.length - 1].text = text;
-            },
-
-            onclosetag: function(tagname){
-                var lastNode = _.last(DOMPath);
-
-                if (targetFound && !targetClosed) {
-
-                    /* --- Check if node text value equals price --- */
-
-                    if (pricesAreSame(Utils.parseNumber(lastNode.text), price)) {
-                        retval.type = 'v:pricerange';
-                        targetClosed = true;
-                        return;
-                    } else {
-                        targetFound = false;
-                    }
-                }
-
-                if (lastNode.tagname === tagname) {
-                    DOMPath.pop();
-                }
-            }
-        }, { decodeEntities: true });
-
-
-    parser.write(data.html);
-    parser.end();
 
 
     /* --- 5) does node have an ID prop --- */
