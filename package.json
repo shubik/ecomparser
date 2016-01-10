@@ -9,6 +9,7 @@
   "dependencies": {
     "cheerio": "^0.19.0",
     "deferred": "^0.7.4",
+    "htmlparser2": "^3.9.0",
     "lodash": "2.4.1",
     "microdata-node": "^0.2.1",
     "request": "^2.62.0",
