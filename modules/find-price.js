@@ -1,7 +1,9 @@
 var _          = require('lodash'),
     Utils      = require('./utils'),
     ns         = require('../lib/ns'),
-    htmlparser = require('htmlparser2');
+    htmlparser = require('htmlparser2'),
+    onopentagFilters,
+    onclosetagFilters;
 
 
 function getNodeSelector (nodes, suffix) {
@@ -29,6 +31,70 @@ function pricesAreSame (p1, p2) {
 }
 
 
+/* --- onopentag filters --- */
+
+function hasItempropPrice (attribs) {
+    return attribs.itemprop && attribs.itemprop === 'price';
+}
+
+function hasDataPriceAttr (attribs) {
+    return !!attribs['data-price'];
+}
+
+function hasVPricerangeAttr (attribs) {
+    return attribs['property'] && attribs['property'] === 'v:pricerange';
+}
+
+onopentagFilters = [hasItempropPrice, hasDataPriceAttr, hasVPricerangeAttr];
+
+
+/* --- onclosetag filters --- */
+
+function matchItempropPrice (lastNode, price, payload, DOMPath) {
+    var success = false;
+
+    if (lastNode.attribs.content && pricesAreSame(lastNode.attribs.content, price)) {
+        payload.type = 'itemprop';
+        payload.get = 'nodeContentAttr';
+        payload.selector = getNodeSelector(DOMPath, '[itemprop="price"]');
+        success = true;
+    } else if (pricesAreSame(Utils.parseNumber(lastNode.text), price)) {
+        payload.type = 'itemprop';
+        payload.get = 'nodeText';
+        payload.selector = getNodeSelector(DOMPath, '[itemprop="price"]');
+        success = true;
+    }
+
+    return success;
+}
+
+function matchDataPriceAttr (lastNode, price, payload, DOMPath) {
+    var success = false;
+
+    if (lastNode.attribs['data-price'] && pricesAreSame(lastNode.attribs['data-price'], price)) {
+        payload.type = 'data-price';
+        success = true;
+    }
+
+    return success;
+}
+
+function matchVPricerangeAttr (lastNode, price, payload, DOMPath) {
+    var success = false;
+
+    if (pricesAreSame(Utils.parseNumber(lastNode.text), price)) {
+        payload.type = 'v:pricerange';
+        success = true;
+    }
+
+    return success;
+}
+
+onclosetagFilters = [matchItempropPrice, matchDataPriceAttr, matchVPricerangeAttr];
+
+
+
+
 module.exports = function(data, price) {
 
     price = price.toString();
@@ -40,10 +106,10 @@ module.exports = function(data, price) {
     /*
 
     1) is in microdata?
-    2) itemprop=\"price\" (value in content or text)?  "42 554 грн"  "43&nbsp;383"  "43,383"
+    2) itemprop="price" (value in content or text)?  "42 554 грн"  "43&nbsp;383"  "43,383"
     3) data-price="NNN"
-    4) had "id" prop?
-    5) property=\"v:pricerange\"?
+    4) property="v:pricerange"?
+    5) has "id" prop?
     6) has class with "price" in it?
     7) parent has class with "price" in it?
     9) JS 'price': '42554'
@@ -68,12 +134,6 @@ module.exports = function(data, price) {
 
 
     /* --- 2) does page contain itemprop="price" --- */
-
-    /*
-
-     Parse node until we find itemprop="price" node
-
-    */
 
     var DOMPath = [],
         targetFound = false,
@@ -135,6 +195,7 @@ module.exports = function(data, price) {
 
     /* --- 3) does page contain data-price="NNN" --- */
 
+
     var DOMPath = [],
         targetFound = false,
         targetClosed = false,
@@ -184,7 +245,56 @@ module.exports = function(data, price) {
     parser.end();
 
 
-    /* --- 4) does page have property=\"v:pricerange\" --- */
+    /* --- 4) does page have property="v:pricerange" --- */
+
+
+    var DOMPath = [],
+        targetFound = false,
+        targetClosed = false,
+
+        parser = new htmlparser.Parser({
+            onopentag: function(tagname, attribs){
+                if (!targetFound) {
+
+                    var node = { tagname : tagname, attribs : attribs };
+                    DOMPath.push(node);
+
+                    if (attribs['property'] && attribs['property'] === 'v:pricerange') {
+                        targetFound = true;
+                    }
+                }
+            },
+
+            ontext: function(text){
+                if (targetClosed) return;
+                DOMPath[DOMPath.length - 1].text = text;
+            },
+
+            onclosetag: function(tagname){
+                var lastNode = _.last(DOMPath);
+
+                if (targetFound && !targetClosed) {
+
+                    /* --- Check if node text value equals price --- */
+
+                    if (pricesAreSame(Utils.parseNumber(lastNode.text), price)) {
+                        retval.type = 'v:pricerange';
+                        targetClosed = true;
+                        return;
+                    } else {
+                        targetFound = false;
+                    }
+                }
+
+                if (lastNode.tagname === tagname) {
+                    DOMPath.pop();
+                }
+            }
+        }, { decodeEntities: true });
+
+
+    parser.write(data.html);
+    parser.end();
 
 
     /* --- 5) does node have an ID prop --- */
