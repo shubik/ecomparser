@@ -26,7 +26,7 @@ function getNodeSelector (nodes, suffix) {
 
 
 function pricesAreSame (p1, p2) {
-    return Number(p1).toFixed() === Number(p2).toFixed();
+    return Number(p1).toFixed(2) === Number(p2).toFixed(2);
 }
 
 
