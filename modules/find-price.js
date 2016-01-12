@@ -2,7 +2,28 @@ var _          = require('lodash'),
     Utils      = require('./utils'),
     ns         = require('../lib/ns'),
     htmlparser = require('htmlparser2'),
-    filters;
+    filters,
+    selfClosingTags;
+
+
+selfClosingTags = [
+    'area',
+    'base',
+    'br',
+    'col',
+    'command',
+    'embed',
+    'hr',
+    'img',
+    'input',
+    'keygen',
+    'link',
+    'meta',
+    'param',
+    'source',
+    'track',
+    'wbr'
+];
 
 
 function getNodeSelector (nodes, suffix) {
@@ -30,27 +51,32 @@ function pricesAreSame (p1, p2) {
 }
 
 
+function cleanAndLower (str) {
+    return Utils.cleanTxt(str).toLowerCase();
+}
 
-/* --- onclosetag filters --- */
 
-function matchItemprop (lastNode, price, payload, DOMPath) {
-    if (lastNode.attribs.itemprop && lastNode.attribs.content && pricesAreSame(lastNode.attribs.content, price)) {
+
+/* --- Filters for product price --- */
+
+function matchPriceItemprop (node, price, payload, path) {
+    if (node.attribs.itemprop && node.attribs.content && pricesAreSame(node.attribs.content, price)) {
         payload.push({
             type     : 'itemprop',
             target   : 'nodeContentAttr',
-            selector : getNodeSelector(DOMPath, '[itemprop="price"]')
+            selector : getNodeSelector(path, '[itemprop="price"]')
         });
-    } else if (lastNode.attribs.itemprop && pricesAreSame(Utils.parseNumber(lastNode.text), price)) {
+    } else if (node.attribs.itemprop && pricesAreSame(Utils.parseNumber(node.text), price)) {
         payload.push({
             type     : 'itemprop',
             target   : 'nodeText',
-            selector : getNodeSelector(DOMPath, '[itemprop="price"]')
+            selector : getNodeSelector(path, '[itemprop="price"]')
         });
     }
 }
 
-function matchDataPriceAttr (lastNode, price, payload, DOMPath) {
-    if (lastNode.attribs['data-price'] && pricesAreSame(lastNode.attribs['data-price'], price)) {
+function matchPriceDataPriceAttr (node, price, payload, path) {
+    if (node.attribs['data-price'] && pricesAreSame(node.attribs['data-price'], price)) {
         payload.push({
             type     : 'data-price',
             target   : 'nodeText'
@@ -58,30 +84,30 @@ function matchDataPriceAttr (lastNode, price, payload, DOMPath) {
     }
 }
 
-function matchVPricerangeAttr (lastNode, price, payload, DOMPath) {
-    if (lastNode.attribs['property'] && lastNode.attribs['property'] === 'v:pricerange' && pricesAreSame(Utils.parseNumber(lastNode.text), price)) {
+function matchPriceVPricerangeAttr (node, price, payload, path) {
+    if (node.attribs['property'] && node.attribs['property'] === 'v:pricerange' && pricesAreSame(Utils.parseNumber(node.text), price)) {
         payload.push({ type : 'v:pricerange' });
         success = true;
     }
 }
 
-function matchNodeWithIdHasPrice (lastNode, price, payload, DOMPath) {
-    if (lastNode.attribs['id'] && pricesAreSame(Utils.parseNumber(lastNode.text), price)) {
+function matchPriceNodeWithIdHasPrice (node, price, payload, path) {
+    if (node.attribs['id'] && pricesAreSame(Utils.parseNumber(node.text), price)) {
         payload.push({
-            type     : 'has-id',
+            type     : 'id',
             target   : 'nodeText',
-            selector : '#' + lastNode.attribs['id']
+            selector : '#' + node.attribs['id']
         });
     }
 }
 
-function matchNodeWithClass (lastNode, price, payload, DOMPath) {
-    if (lastNode.attribs['class']) {
-        var matches = lastNode.attribs['class'].match(/\b(?=\w*price)\w+\b/i);
+function matchPriceNodeWithClass (node, price, payload, path) {
+    if (node.attribs['class']) {
+        var matches = node.attribs['class'].match(/\b(?=\w*price)\w+\b/i);
 
-        if (matches && pricesAreSame(Utils.parseNumber(lastNode.text), price)) {
+        if (matches && pricesAreSame(Utils.parseNumber(node.text), price)) {
             payload.push({
-                type     : 'class-has-price',
+                type     : 'class',
                 target   : 'nodeText',
                 selector : '.' + matches[0]
             });
@@ -89,31 +115,63 @@ function matchNodeWithClass (lastNode, price, payload, DOMPath) {
     }
 }
 
-
-function matchAllNodes (lastNode, price, payload, DOMPath) {
-    if (pricesAreSame(Utils.parseNumber(lastNode.text), price)) {
+function matchPriceAllNodes (node, price, payload, path) {
+    if (pricesAreSame(Utils.parseNumber(node.text), price)) {
         payload.push({
             type     : 'selector',
             target   : 'nodeText',
-            selector : getNodeSelector(DOMPath)
+            selector : getNodeSelector(path)
         });
     }
 }
 
 
-filters = [
-    matchItemprop,
-    matchDataPriceAttr,
-    matchVPricerangeAttr,
-    matchNodeWithIdHasPrice,
-    matchNodeWithClass,
-    matchAllNodes
+/* --- Filters for product title --- */
+
+function matchTitleAllNodes (node, title, payload, path) {
+    var title = cleanAndLower(title);
+
+    if (cleanAndLower(node.text || '') === title) {
+
+        if (node.attribs.itemprop && node.attribs.itemprop === 'title') {
+            console.log('matchTitleAllNodes() itemprop="title"', title);
+        } else if (node.attribs.id) {
+            console.log('matchTitleAllNodes() id', node.attribs.id, title);
+        } else if (node.attribs['class']) {
+            var matches = node.attribs['class'].match(/\b(?=\w*price)\w+\b/i);
+
+            if (matches) {
+                console.log('matchTitleAllNodes() class', matches[0], title);
+            }
+        } else {
+            console.log('matchTitleAllNodes() selector', getNodeSelector(path));
+        }
+
+    }
+
+    if (node.attribs.property && node.attribs.property === 'og:title' && cleanAndLower(node.attribs.content) === title) {
+        console.log('matchTitleAllNodes() og:title', title);
+    }
+}
+
+
+filtersPrice = [
+    matchPriceItemprop,
+    matchPriceDataPriceAttr,
+    matchPriceVPricerangeAttr,
+    matchPriceNodeWithIdHasPrice,
+    matchPriceNodeWithClass,
+    matchPriceAllNodes
+];
+
+
+filtersTitle = [
+    matchTitleAllNodes
 ];
 
 
 
-
-module.exports = function(data, price) {
+module.exports = function(data, price, title) {
 
     price = price.toString();
 
@@ -161,14 +219,30 @@ module.exports = function(data, price) {
             onopentag: function(tagname, attribs){
                 var node = { tagname : tagname, attribs : attribs };
                 DOMPath.push(node);
+
+                if (-~selfClosingTags.indexOf(tagname)) {
+
+                    _.each(filtersPrice, function(filter) {
+                        filter(DOMPath[DOMPath.length - 1], price, retval, DOMPath);
+                    });
+
+                    _.each(filtersTitle, function(filter) {
+                        filter(DOMPath[DOMPath.length - 1], title, retval, DOMPath);
+                    });
+
+                }
             },
 
             ontext: function(text){
                 if (targetClosed) return;
                 DOMPath[DOMPath.length - 1].text = text;
 
-                _.each(filters, function(filter) {
+                _.each(filtersPrice, function(filter) {
                     filter(DOMPath[DOMPath.length - 1], price, retval, DOMPath);
+                });
+
+                _.each(filtersTitle, function(filter) {
+                    filter(DOMPath[DOMPath.length - 1], title, retval, DOMPath);
                 });
             },
 

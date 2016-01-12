@@ -3,7 +3,10 @@ var ecomparser = require('../index');
 
 
 var pages = [
-    { url: "http://a-techno.com.ua/72767.html", price: 52599 },
+    { url: "http://www.citrus.ua/shop/goods/tabletpc/262/248181", price: 23299, title: 'Apple iPad mini 4 128Gb WiFi+4G Gold (MK782)' },
+    { url: "http://a-techno.com.ua/72767.html", price: 52599, title: 'Apple A1418 iMac (MK452UA/A)' },
+    { url: "http://comfy.ua/televizor-finlux-32-flyr-274s.html", price: 15199, title: 'Телевизор LG 43LF590V' },
+    { url: "http://www.mobilluck.com.ua/katalog/LCDTV/Saturn/Saturn-LED46KF-334620.html", price: 12786, title: 'LED телевизор Saturn LED46KF' }
     // { url: "http://www.notus.com.ua/Apple-iMac-215-4K-display-MK452-NEW-2015", price: 42554 },
     // { url: "http://portativ.ua/product_98429.html", price: 43383 },
     // { url: "http://xclusive.com.ua/catalog/macbook/mk452.html", price: 42549 },
@@ -25,12 +28,11 @@ var pages = [
 
 
 pages.forEach(function(page) {
-
     var test = ecomparser.analyze(page.url);
 
     test.done(function(data) {
 
-        var priceData = ecomparser.findPrice(data, page.price);
+        var priceData = ecomparser.findPrice(data, page.price, page['title']);
         console.log('\nPRICE DATA:', page.url, priceData);
 
     }, function(err) {
