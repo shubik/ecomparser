@@ -32,8 +32,8 @@ pages.forEach(function(page) {
 
     test.done(function(data) {
 
-        var priceData = ecomparser.findPrice(data, page.price, page['title']);
-        console.log('\nPRICE DATA:', page.url, priceData);
+        var priceData = ecomparser.findAttributes(data, page.price, page['title']);
+        console.log('\nPRODUCT DATA:', page.url, priceData);
 
     }, function(err) {
         console.log(err.toString());

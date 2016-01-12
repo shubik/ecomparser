@@ -3,10 +3,10 @@ var _          = require('lodash'),
     ns         = require('../lib/ns'),
     htmlparser = require('htmlparser2'),
     filters,
-    selfClosingTags;
+    selfClosingHTMLTags;
 
 
-selfClosingTags = [
+selfClosingHTMLTags = [
     'area',
     'base',
     'br',
@@ -134,17 +134,42 @@ function matchTitleAllNodes (node, title, payload, path) {
     if (cleanAndLower(node.text || '') === title) {
 
         if (node.attribs.itemprop && node.attribs.itemprop === 'title') {
-            console.log('matchTitleAllNodes() itemprop="title"', title);
+
+            payload.push({
+                titleType     : 'itemprop',
+                titleSelector : 'meta[property="og:title"]'
+            });
+
+        } else if (node.attribs.property && node.attribs.property === 'v:itemreviewed') {
+
+            payload.push({
+                titleType     : 'v:itemreviewed',
+                titleSelector : 'meta[property="og:title"]'
+            });
+
         } else if (node.attribs.id) {
-            console.log('matchTitleAllNodes() id', node.attribs.id, title);
+
+            payload.push({
+                titleType     : 'id',
+                titleSelector : '#' + node.attribs.id
+            });
+
         } else if (node.attribs['class']) {
-            var matches = node.attribs['class'].match(/\b(?=\w*price)\w+\b/i);
+
+            var matches = node.attribs['class'].match(/\b(?=\w*[title|product|name])\w+\b/i);
 
             if (matches) {
-                console.log('matchTitleAllNodes() class', matches[0], title);
+                payload.push({
+                    titleType     : 'class',
+                    titleSelector : '.' + matches[0]
+                });
             }
+
         } else {
-            console.log('matchTitleAllNodes() selector', getNodeSelector(path));
+            payload.push({
+                titleType     : 'selector',
+                titleSelector : getNodeSelector(path)
+            });
         }
 
     }
@@ -201,7 +226,6 @@ module.exports = function(data, price, title) {
                 return memo;
             }, null);
 
-
         namespace !== null && retval.push({
             type : 'microdata',
             key  : namespace
@@ -220,7 +244,7 @@ module.exports = function(data, price, title) {
                 var node = { tagname : tagname, attribs : attribs };
                 DOMPath.push(node);
 
-                if (-~selfClosingTags.indexOf(tagname)) {
+                if (-~selfClosingHTMLTags.indexOf(tagname)) {
 
                     _.each(filtersPrice, function(filter) {
                         filter(DOMPath[DOMPath.length - 1], price, retval, DOMPath);
@@ -229,7 +253,6 @@ module.exports = function(data, price, title) {
                     _.each(filtersTitle, function(filter) {
                         filter(DOMPath[DOMPath.length - 1], title, retval, DOMPath);
                     });
-
                 }
             },
 
