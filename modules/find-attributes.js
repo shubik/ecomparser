@@ -64,13 +64,15 @@ function matchPriceItemprop (node, price, payload, path) {
         payload.push({
             type     : 'itemprop',
             target   : 'nodeContentAttr',
-            selector : getNodeSelector(path, '[itemprop="price"]')
+            selector : getNodeSelector(path, '[itemprop="price"]'),
+            info     : 'Price is contained in the content attribute of node with itemprop="price"'
         });
     } else if (node.attribs.itemprop && pricesAreSame(Utils.parseNumber(node.text), price)) {
         payload.push({
             type     : 'itemprop',
-            target   : 'nodeText',
-            selector : getNodeSelector(path, '[itemprop="price"]')
+            target   : 'textContent',
+            selector : getNodeSelector(path, '[itemprop="price"]'),
+            info     : 'Price is contained in the textContent of node with itemprop="price" attribute'
         });
     }
 }
@@ -79,14 +81,19 @@ function matchPriceDataPriceAttr (node, price, payload, path) {
     if (node.attribs['data-price'] && pricesAreSame(node.attribs['data-price'], price)) {
         payload.push({
             type     : 'data-price',
-            target   : 'nodeText'
+            target   : 'textContent',
+            info     : 'Price is contained in the textContent of node with data-price attribute'
         });
     }
 }
 
 function matchPriceVPricerangeAttr (node, price, payload, path) {
     if (node.attribs['property'] && node.attribs['property'] === 'v:pricerange' && pricesAreSame(Utils.parseNumber(node.text), price)) {
-        payload.push({ type : 'v:pricerange' });
+        payload.push({
+            type     : 'v:pricerange',
+            target   : 'textContent',
+            info     : 'Price is contained in the textContent of node with property="v:pricerange" attribute'
+        });
         success = true;
     }
 }
@@ -95,8 +102,9 @@ function matchPriceNodeWithIdHasPrice (node, price, payload, path) {
     if (node.attribs['id'] && pricesAreSame(Utils.parseNumber(node.text), price)) {
         payload.push({
             type     : 'id',
-            target   : 'nodeText',
-            selector : '#' + node.attribs['id']
+            target   : 'textContent',
+            selector : '#' + node.attribs['id'],
+            info     : 'Price is contained in the textContent of node with unique id'
         });
     }
 }
@@ -108,8 +116,9 @@ function matchPriceNodeWithClass (node, price, payload, path) {
         if (matches && pricesAreSame(Utils.parseNumber(node.text), price)) {
             payload.push({
                 type     : 'class',
-                target   : 'nodeText',
-                selector : '.' + matches[0]
+                target   : 'textContent',
+                selector : '.' + matches[0],
+                info     : 'Price is contained in the textContent of node with class name containing word price'
             });
         }
     }
@@ -119,8 +128,9 @@ function matchPriceAllNodes (node, price, payload, path) {
     if (pricesAreSame(Utils.parseNumber(node.text), price)) {
         payload.push({
             type     : 'selector',
-            target   : 'nodeText',
-            selector : getNodeSelector(path)
+            target   : 'textContent',
+            selector : getNodeSelector(path),
+            info     : 'Price is contained in the textContent of unclassified node'
         });
     }
 }
@@ -137,21 +147,27 @@ function matchTitleAllNodes (node, title, payload, path) {
 
             payload.push({
                 titleType     : 'itemprop',
-                titleSelector : 'meta[property="og:title"]'
+                titleSelector : '[property="og:title"]',
+                titleTarget   : 'textContent',
+                info          : 'Title is contained in the textContent of Open Graph meta tag with property="og:title"'
             });
 
         } else if (node.attribs.property && node.attribs.property === 'v:itemreviewed') {
 
             payload.push({
                 titleType     : 'v:itemreviewed',
-                titleSelector : 'meta[property="og:title"]'
+                titleSelector : '[property="v:itemreviewed"]',
+                titleTarget   : 'textContent',
+                info          : 'Title is contained in the textContent of a tag with property="v:itemreviewed"'
             });
 
         } else if (node.attribs.id) {
 
             payload.push({
                 titleType     : 'id',
-                titleSelector : '#' + node.attribs.id
+                titleSelector : '#' + node.attribs.id,
+                titleTarget   : 'textContent',
+                info          : 'Title is contained in the textContent of a node with unique id'
             });
 
         } else if (node.attribs['class']) {
@@ -161,14 +177,18 @@ function matchTitleAllNodes (node, title, payload, path) {
             if (matches) {
                 payload.push({
                     titleType     : 'class',
-                    titleSelector : '.' + matches[0]
+                    titleTarget   : 'textContent',
+                    titleSelector : '.' + matches[0],
+                    info          : 'Title is contained in the textContent of a node with unique class containing words title|product|name'
                 });
             }
 
         } else {
             payload.push({
                 titleType     : 'selector',
-                titleSelector : getNodeSelector(path)
+                titleTarget   : 'textContent',
+                titleSelector : getNodeSelector(path),
+                info          : 'Title is contained in the textContent of an unclassified node'
             });
         }
 
@@ -228,7 +248,8 @@ module.exports = function(data, price, title) {
 
         namespace !== null && retval.push({
             type : 'microdata',
-            key  : namespace
+            key  : namespace,
+            info : 'Page contains microdata with product price'
         });
     }
 
