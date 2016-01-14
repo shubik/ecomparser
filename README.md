@@ -14,6 +14,11 @@ Ecomparser is a Node.js library for parsing e-commerce web pages in order to ret
 npm install ecomparser
 ```
 
+## Use cases
+
+*   Grab product data from e-commerce web sites when user wants to share a product URL via your application (social network, gift registry, etc)
+*   Parse pages from e-commerce web sites for your price aggregator
+
 ## Sample usage
 
 ```js
